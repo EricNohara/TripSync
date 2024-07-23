@@ -7,8 +7,8 @@ const port = 8080;
 
 // Setting up server with hbs and methodOverride
 const hbs = require("express-handlebars").create({
-  layoutsDir: "/views/layouts",
-  partialsDir: "views/partials",
+  layoutsDir: __dirname + "/views/layouts",
+  partialsDir: __dirname + "/views/partials",
   extname: "hbs",
   defaultLayout: "main",
   runtimeOptions: {
@@ -41,6 +41,10 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }));
 
 // Routes
+const indexRouter = require("./routes/index");
+
+app.use("/", indexRouter);
+
 app.listen(app.get("port"), () => {
   console.log("Server started at http://localhost:" + app.get("port"));
 });
