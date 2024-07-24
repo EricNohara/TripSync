@@ -1,0 +1,12 @@
+<form action="{{formAction}}" method="POST">
+  {{#if (isRegisterForm loginOrRegister)}}
+    <label>Username</label>
+    <input type="text" name="username" />
+  {{else}}
+  {{/if}}
+  <label>Email</label>
+  <input type="text" name="email" />
+  <label>Password</label>
+  <input type="text" name="password" />
+  <button type="submit">{{loginOrRegister}}</button>
+</form>

@@ -1,1 +1,6 @@
-<a href="/users/signup">Sign Up</a>
+{{> errorMessage}}
+{{> loginForm formAction="/users/login" loginOrRegister="Log In"}}
+<div>
+    <p>Don't have an account?</p>
+    <a href="/users/register">Sign Up</a>
+</div>

@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 
 const express = require("express");
 const methodOverride = require("method-override");
+const cookieParser = require("cookie-parser");
 const app = express();
 const port = 8080;
 
@@ -15,6 +16,11 @@ const hbs = require("express-handlebars").create({
     allowProtoMethodsByDefault: true,
     allowProtoPropertiesByDefault: true,
   },
+  helpers: {
+    isRegisterForm: (loginOrRegister) => {
+      return loginOrRegister === "Sign Up";
+    },
+  },
 });
 
 app.set("port", process.env.PORT || port);
@@ -22,6 +28,8 @@ app.set("view engine", "hbs");
 app.engine("hbs", hbs.engine);
 app.use(express.static("public"));
 app.use(methodOverride("_method"));
+app.use(express.json());
+app.use(cookieParser());
 
 // Setting up server with Mongoose
 const mongoose = require("mongoose");

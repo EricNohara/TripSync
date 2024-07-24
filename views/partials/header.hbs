@@ -1,12 +1,15 @@
 <header>
   <nav class="header-nav">
-    <a class="header-title" href="/">TripSync</a>
-    <ul>
-      {{#if user}}
+    {{#if user}}
+      <a href="/users/user">TripSync</a>
+      <ul>
         <li><a href="/users/logout">Log Out</a></li>
-      {{else}}
+      </ul>
+    {{else}}
+      <a class="header-title" href="/">TripSync</a>
+      <ul>
         <li><a href="/users/login">Login</a></li>
-      {{/if}}
-    </ul>
+      </ul>
+    {{/if}}
   </nav>
 </header>
