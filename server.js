@@ -21,7 +21,7 @@ const hbs = require("express-handlebars").create({
       return loginOrRegister === "Sign Up";
     },
     getUserPath: (user) => {
-      return user != null ? "users/user" : "/";
+      return user != null ? `/users/${user.id}` : "/";
     },
   },
 });

@@ -6,18 +6,8 @@ const User = require("../models/user");
 const router = express.Router();
 
 // Home Page to Search for Users
-router.get("/", async (req, res) => {
-  let searchOptions = {};
-  if (req.query.username != null && req.query.username !== "") {
-    searchOptions.username = new RegExp(req.query.username, "i");
-  }
-
-  try {
-    const users = await User.find(searchOptions);
-    res.render("users/index", { users: users, searchOptions: req.query });
-  } catch {
-    res.redirect("/");
-  }
+router.get("/", redirectToUserSearchPage, async (req, res) => {
+  loadSearchableUsers(req, res);
 });
 
 // Login Route
@@ -44,7 +34,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true });
-    res.redirect("users/user");
+    res.redirect(`/users/${user.id}`);
   } catch (err) {
     res.render("users/login", { errorMessage: err });
   }
@@ -77,7 +67,7 @@ router.post("/register", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true });
-    res.redirect("users/user");
+    res.redirect(`/users/${newUser.id}`);
   } catch (err) {
     res.render("users/register", {
       errorMessage: err,
@@ -85,22 +75,27 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Showing User Route
-router.get("/user", verifyToken, async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.user.email });
-    if (!user) throw "User not found!";
-
-    res.render("users/user", { user: user });
-  } catch (err) {
-    res.render("/", { errorMessage: err });
-  }
-});
-
 // Logging Out Route
 router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/users/login");
+});
+
+// Showing User Route
+router.get("/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) throw "User not found!";
+    res.render("users/user", { user: user });
+  } catch (err) {
+    console.error(err);
+    res.render("/", { errorMessage: err });
+  }
+});
+
+// Signed in User Search Route
+router.get("/:id/search", async (req, res) => {
+  loadSearchableUsers(req, res);
 });
 
 // Middleware for JWT validation
@@ -118,6 +113,33 @@ function verifyToken(req, res, next) {
     req.user = decoded;
     next();
   });
+}
+
+function redirectToUserSearchPage(req, res, next) {
+  const token =
+    req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
+  if (!token) return next();
+
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    if (err) return next();
+    const user = await User.findOne({ email: decoded.email });
+    if (user) return res.redirect(`/users/${user.id}/search`);
+    else next();
+  });
+}
+
+async function loadSearchableUsers(req, res) {
+  let searchOptions = {};
+  if (req.query.username != null && req.query.username !== "") {
+    searchOptions.username = new RegExp(req.query.username, "i");
+  }
+
+  try {
+    const users = await User.find(searchOptions);
+    res.render("users/index", { users: users, searchOptions: req.query });
+  } catch {
+    res.redirect("/");
+  }
 }
 
 module.exports = router;
