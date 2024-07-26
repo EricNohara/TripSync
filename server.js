@@ -20,6 +20,9 @@ const hbs = require("express-handlebars").create({
     isRegisterForm: (loginOrRegister) => {
       return loginOrRegister === "Sign Up";
     },
+    getUserPath: (user) => {
+      return user != null ? "users/user" : "/";
+    },
   },
 });
 
@@ -51,9 +54,11 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }));
 // Routes
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
+const tempDevRouter = require("./routes/tempDev");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
+app.use("/tempDev", tempDevRouter);
 
 app.listen(app.get("port"), () => {
   console.log("Server started at http://localhost:" + app.get("port"));

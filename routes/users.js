@@ -5,8 +5,19 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.send("This is the users index page.");
+// Home Page to Search for Users
+router.get("/", async (req, res) => {
+  let searchOptions = {};
+  if (req.query.username != null && req.query.username !== "") {
+    searchOptions.username = new RegExp(req.query.username, "i");
+  }
+
+  try {
+    const users = await User.find(searchOptions);
+    res.render("users/index", { users: users, searchOptions: req.query });
+  } catch {
+    res.redirect("/");
+  }
 });
 
 // Login Route
@@ -33,7 +44,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true });
-    res.redirect("/users/user");
+    res.redirect("users/user");
   } catch (err) {
     res.render("users/login", { errorMessage: err });
   }
