@@ -95,7 +95,14 @@ router.get("/:id", verifyToken, async (req, res) => {
 
 // Signed in User Search Route
 router.get("/:id/search", async (req, res) => {
-  loadSearchableUsers(req, res);
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) throw "User not found!";
+    loadSearchableUsers(req, res, user);
+  } catch (err) {
+    console.error(err);
+    res.render("/", { errorMessage: err });
+  }
 });
 
 // Middleware for JWT validation
@@ -122,13 +129,14 @@ function redirectToUserSearchPage(req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) return next();
+    req.user = decoded;
     const user = await User.findOne({ email: decoded.email });
     if (user) return res.redirect(`/users/${user.id}/search`);
-    else next();
+    next();
   });
 }
 
-async function loadSearchableUsers(req, res) {
+async function loadSearchableUsers(req, res, user = null) {
   let searchOptions = {};
   if (req.query.username != null && req.query.username !== "") {
     searchOptions.username = new RegExp(req.query.username, "i");
@@ -136,7 +144,11 @@ async function loadSearchableUsers(req, res) {
 
   try {
     const users = await User.find(searchOptions);
-    res.render("users/index", { users: users, searchOptions: req.query });
+    res.render("users/index", {
+      users: users,
+      user: user,
+      searchOptions: req.query,
+    });
   } catch {
     res.redirect("/");
   }
