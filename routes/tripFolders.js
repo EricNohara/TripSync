@@ -17,7 +17,7 @@ router.get("/shared", verifyToken, async (req, res) => {
 });
 
 // All Trips Route
-router.get("/:id", verifyToken, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     res.render("tripFolders/index", { user: user });
@@ -28,13 +28,25 @@ router.get("/:id", verifyToken, async (req, res) => {
 });
 
 // Private Trips Route
-router.get("/:id/private", verifyToken, (req, res) => {
-  res.send("this is PRIVATE trips");
+router.get("/:id/private", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.render("tripFolders/private", { user: user });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/");
+  }
 });
 
 // Shared Trips Route
-router.get("/:id/shared", verifyToken, (req, res) => {
-  res.send("this is SHARED trips");
+router.get("/:id/shared", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.render("tripFolders/shared", { user: user });
+  } catch (err) {
+    console.error(err);
+    res.redirect("/");
+  }
 });
 
 async function retrieveUserFromTokenAndRedirect(req, res, redirectRoute = "") {
