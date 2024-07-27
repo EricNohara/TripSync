@@ -53,12 +53,14 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }));
 
 // Routes
 const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users");
-const tempDevRouter = require("./routes/tempDev");
+const usersRouter = require("./routes/users").router;
+const tripFoldersRouter = require("./routes/tripFolders");
+// const tempDevRouter = require("./routes/tempDev");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/tempDev", tempDevRouter);
+app.use("/tripFolders", tripFoldersRouter);
+// app.use("/tempDev", tempDevRouter);
 
 app.listen(app.get("port"), () => {
   console.log("Server started at http://localhost:" + app.get("port"));

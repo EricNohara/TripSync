@@ -154,4 +154,4 @@ async function loadSearchableUsers(req, res, user = null) {
   }
 }
 
-module.exports = router;
+module.exports = { router, verifyToken };
