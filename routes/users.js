@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const router = express.Router();
+// const tokenExpiration = "1h";
 
 // Home Page to Search for Users
 router.get("/", redirectToUserSearchPage, async (req, res) => {
@@ -33,7 +34,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect(`/users/${user.id}`);
   } catch (err) {
     res.render("users/login", { errorMessage: err });
@@ -66,7 +67,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect(`/users/${newUser.id}`);
   } catch (err) {
     res.render("users/register", {
@@ -89,7 +90,7 @@ router.get("/:id", verifyToken, async (req, res) => {
     res.render("users/user", { user: user });
   } catch (err) {
     console.error(err);
-    res.render("/", { errorMessage: err });
+    res.render("index", { errorMessage: err });
   }
 });
 
@@ -101,7 +102,7 @@ router.get("/:id/search", async (req, res) => {
     loadSearchableUsers(req, res, user);
   } catch (err) {
     console.error(err);
-    res.render("/", { errorMessage: err });
+    res.render("index", { errorMessage: err });
   }
 });
 
@@ -110,12 +111,16 @@ function verifyToken(req, res, next) {
   const token =
     req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ error: "Unauthorized" });
+    return res.render("index", {
+      errorMessage: "Unauthorized. Please Log In.",
+    });
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.render("index", {
+        errorMessage: "Unauthorized. Please Log In.",
+      });
     }
     req.user = decoded;
     next();
