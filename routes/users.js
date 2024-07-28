@@ -4,23 +4,18 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const router = express.Router();
-const {
-  verifyToken,
-  handleVerifyTokenError,
-} = require("../public/javascripts/userOperations");
+const { verifyToken } = require("../public/javascripts/userOperations");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
-
   try {
+    if (req.authError) throw req.authError;
     const user = await User.findOne({ email: req.user.email });
     loadSearchableUsers(req, res, user);
   } catch (err) {
-    if (err == "Unauthorized: Please Log In") {
-      res.render("index", { errorMessage: err });
+    if (err == req.authError) {
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
     } else {
-      console.error(err);
       res.redirect("/");
     }
   }
@@ -51,7 +46,6 @@ router.post("/login", async (req, res) => {
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.render("index", { user: user });
-    // res.redirect(`/users/${user.id}`);
   } catch (err) {
     res.render("users/login", { errorMessage: err });
   }
@@ -98,6 +92,7 @@ router.get("/logout", (req, res) => {
   res.redirect("/users/login");
 });
 
+// helper function to load all users based on query
 async function loadSearchableUsers(req, res, user = null) {
   let searchOptions = {};
   if (req.query.username != null && req.query.username !== "") {

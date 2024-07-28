@@ -7,12 +7,12 @@ const {
 } = require("../public/javascripts/userOperations");
 
 router.get("/", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res, false); // dont show the error message
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     const user = await retrieveUser(req);
     res.render("index", { user: user });
   } catch {
-    res.render("index");
+    res.render("index", { errorMessage: errorMessage });
   }
 });
 

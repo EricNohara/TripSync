@@ -5,48 +5,50 @@ const User = require("../models/user");
 const {
   verifyToken,
   retrieveUser,
-  handleVerifyTokenError,
 } = require("../public/javascripts/userOperations");
-const { urlencoded } = require("body-parser");
-const { search } = require(".");
 
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
-  await retrieveUserAndRedirect(req, res, "index");
+  try {
+    if (req.authError) throw req.authError;
+    await retrieveUserAndRedirect(req, res, "index");
+  } catch (err) {
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  }
 });
 
 router.get("/private", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
   try {
+    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     await loadSearchableFolders(req, res, user, "private");
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
 router.get("/shared", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
   try {
+    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     await loadSearchableFolders(req, res, user, "shared");
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
 router.get("/create", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
-  await retrieveUserAndRedirect(req, res, "create");
+  try {
+    if (req.authError) throw req.authError;
+    await retrieveUserAndRedirect(req, res, "create");
+  } catch (err) {
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  }
 });
 
 router.post("/create", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
-
   try {
+    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = new TripFolder({
       folderName: req.body.folderName,
@@ -56,15 +58,13 @@ router.post("/create", verifyToken, async (req, res) => {
     const newTripFolder = await tripFolder.save();
     res.redirect(`/tripFolders/private/${newTripFolder.id}`);
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
 router.get("/private/:tripID", verifyToken, async (req, res) => {
-  handleVerifyTokenError(req, res);
-
   try {
+    if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
     const user = await retrieveUser(req, res);
     let usernames = await Promise.all(
@@ -83,8 +83,7 @@ router.get("/private/:tripID", verifyToken, async (req, res) => {
       user: user,
     });
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
@@ -101,8 +100,7 @@ async function retrieveUserAndRedirect(
       tripFolders: tripFolders,
     });
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 }
 
