@@ -7,8 +7,14 @@ const router = express.Router();
 // const tokenExpiration = "1h";
 
 // Home Page to Search for Users
-router.get("/", redirectToUserSearchPage, async (req, res) => {
-  loadSearchableUsers(req, res);
+router.get("/", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.user.email });
+    loadSearchableUsers(req, res, user);
+  } catch (err) {
+    console.error(err);
+    res.redirect("/");
+  }
 });
 
 // Login Route
@@ -35,7 +41,8 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.redirect(`/users/${user.id}`);
+    res.render("index", { user: user });
+    // res.redirect(`/users/${user.id}`);
   } catch (err) {
     res.render("users/login", { errorMessage: err });
   }
@@ -68,7 +75,7 @@ router.post("/register", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.redirect(`/users/${newUser.id}`);
+    res.render("index", { user: newUser });
   } catch (err) {
     res.render("users/register", {
       errorMessage: err,
@@ -80,30 +87,6 @@ router.post("/register", async (req, res) => {
 router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/users/login");
-});
-
-// Showing User Route
-router.get("/:id", verifyToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) throw "User not found!";
-    res.render("users/user", { user: user });
-  } catch (err) {
-    console.error(err);
-    res.render("index", { errorMessage: err });
-  }
-});
-
-// Signed in User Search Route
-router.get("/:id/search", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) throw "User not found!";
-    loadSearchableUsers(req, res, user);
-  } catch (err) {
-    console.error(err);
-    res.render("index", { errorMessage: err });
-  }
 });
 
 // Middleware for JWT validation
@@ -127,20 +110,6 @@ function verifyToken(req, res, next) {
   });
 }
 
-function redirectToUserSearchPage(req, res, next) {
-  const token =
-    req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
-  if (!token) return next();
-
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if (err) return next();
-    req.user = decoded;
-    const user = await User.findOne({ email: decoded.email });
-    if (user) return res.redirect(`/users/${user.id}/search`);
-    next();
-  });
-}
-
 async function loadSearchableUsers(req, res, user = null) {
   let searchOptions = {};
   if (req.query.username != null && req.query.username !== "") {
@@ -155,6 +124,15 @@ async function loadSearchableUsers(req, res, user = null) {
       searchOptions: req.query,
     });
   } catch {
+    res.redirect("/");
+  }
+}
+
+async function retrieveUser(req) {
+  try {
+    return await User.findOne({ email: req.user.email });
+  } catch (err) {
+    console.error(err);
     res.redirect("/");
   }
 }

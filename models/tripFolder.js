@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
 
 const tripFolderSchema = new mongoose.Schema({
-  folderType: {
+  folderName: {
     type: String,
     required: true,
+  },
+  isShared: {
+    type: Boolean,
+    required: true,
+    default: false,
   },
   users: {
     type: Array,

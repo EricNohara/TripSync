@@ -5,54 +5,50 @@ const router = express.Router();
 
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
-  await retrieveUserFromTokenAndRedirect(req, res);
+  await retrieveUserAndRedirect(req, res, "index");
 });
 
 router.get("/private", verifyToken, async (req, res) => {
-  await retrieveUserFromTokenAndRedirect(req, res, "private");
+  await retrieveUserAndRedirect(req, res, "private");
 });
 
 router.get("/shared", verifyToken, async (req, res) => {
-  await retrieveUserFromTokenAndRedirect(req, res, "shared");
+  await retrieveUserAndRedirect(req, res, "shared");
 });
 
-// All Trips Route
-router.get("/:id", async (req, res) => {
+router.get("/create", verifyToken, async (req, res) => {
+  await retrieveUserAndRedirect(req, res, "create");
+});
+
+router.post("/create", verifyToken, async (req, res) => {
+  const user = await retrieveUser(req);
+  res.send("done");
+});
+
+// Create Trips Route
+router.get("/:id/create", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    res.render("tripFolders/index", { user: user });
+    res.render("tripFolders/create", { user: user });
   } catch (err) {
     console.error(err);
     res.redirect("/");
   }
 });
 
-// Private Trips Route
-router.get("/:id/private", async (req, res) => {
+async function retrieveUserAndRedirect(req, res, redirectRoute) {
   try {
-    const user = await User.findById(req.params.id);
-    res.render("tripFolders/private", { user: user });
+    const user = await retrieveUser(req);
+    res.render(`tripFolders/${redirectRoute}`, { user: user });
   } catch (err) {
     console.error(err);
     res.redirect("/");
   }
-});
+}
 
-// Shared Trips Route
-router.get("/:id/shared", async (req, res) => {
+async function retrieveUser(req) {
   try {
-    const user = await User.findById(req.params.id);
-    res.render("tripFolders/shared", { user: user });
-  } catch (err) {
-    console.error(err);
-    res.redirect("/");
-  }
-});
-
-async function retrieveUserFromTokenAndRedirect(req, res, redirectRoute = "") {
-  try {
-    const user = await User.findOne({ email: req.user.email });
-    res.redirect(`/tripFolders/${user.id}/${redirectRoute}`);
+    return await User.findOne({ email: req.user.email });
   } catch (err) {
     console.error(err);
     res.redirect("/");

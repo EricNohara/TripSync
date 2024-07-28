@@ -1,14 +1,14 @@
 <header>
   <nav>
-    <a href={{getUserPath user}}>TripSync</a>
+    <a href="/">TripSync</a>
     <ul>
       {{#if user}}
         <li><a href="/users/logout">Log Out</a></li>
         <li><a href="/tripFolders">Trip Folders</a></li>
+        <li><a href="/users">Search Users</a></li>
       {{else}}
         <li><a href="/users/login">Login</a></li>
       {{/if}}
-      <li><a href="/users">Search Users</a></li>
     </ul>
   </nav>
 </header>
