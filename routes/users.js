@@ -4,16 +4,25 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const router = express.Router();
-// const tokenExpiration = "1h";
+const {
+  verifyToken,
+  handleVerifyTokenError,
+} = require("../public/javascripts/userOperations");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
+  handleVerifyTokenError(req, res);
+
   try {
     const user = await User.findOne({ email: req.user.email });
     loadSearchableUsers(req, res, user);
   } catch (err) {
-    console.error(err);
-    res.redirect("/");
+    if (err == "Unauthorized: Please Log In") {
+      res.render("index", { errorMessage: err });
+    } else {
+      console.error(err);
+      res.redirect("/");
+    }
   }
 });
 
@@ -89,27 +98,6 @@ router.get("/logout", (req, res) => {
   res.redirect("/users/login");
 });
 
-// Middleware for JWT validation
-function verifyToken(req, res, next) {
-  const token =
-    req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
-  if (!token) {
-    return res.render("index", {
-      errorMessage: "Unauthorized. Please Log In.",
-    });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) {
-      return res.render("index", {
-        errorMessage: "Unauthorized. Please Log In.",
-      });
-    }
-    req.user = decoded;
-    next();
-  });
-}
-
 async function loadSearchableUsers(req, res, user = null) {
   let searchOptions = {};
   if (req.query.username != null && req.query.username !== "") {
@@ -128,13 +116,4 @@ async function loadSearchableUsers(req, res, user = null) {
   }
 }
 
-async function retrieveUser(req) {
-  try {
-    return await User.findOne({ email: req.user.email });
-  } catch (err) {
-    console.error(err);
-    res.redirect("/");
-  }
-}
-
-module.exports = { router, verifyToken };
+module.exports = router;

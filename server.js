@@ -53,7 +53,7 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }));
 
 // Routes
 const indexRouter = require("./routes/index");
-const usersRouter = require("./routes/users").router;
+const usersRouter = require("./routes/users");
 const tripFoldersRouter = require("./routes/tripFolders");
 // const tempDevRouter = require("./routes/tempDev");
 
