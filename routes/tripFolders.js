@@ -6,6 +6,7 @@ const {
   verifyToken,
   retrieveUser,
 } = require("../public/javascripts/userOperations");
+const tripFolder = require("../models/tripFolder");
 
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
@@ -56,12 +57,13 @@ router.post("/create", verifyToken, async (req, res) => {
       users: [user.id],
     });
     const newTripFolder = await tripFolder.save();
-    res.redirect(`/tripFolders/private/${newTripFolder.id}`);
+    res.redirect(`/tripFolders/${newTripFolder.id}`);
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
+// Route to Show Trip Folder
 router.get("/:tripID", verifyToken, async (req, res) => {
   try {
     if (req.authError) throw req.authError;
@@ -87,11 +89,16 @@ router.get("/:tripID", verifyToken, async (req, res) => {
   }
 });
 
+// Route to Edit Trip Folder
 router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
   try {
     if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
-    res.render("tripFolders/folderPage/editFolder", { tripFolder: tripFolder });
+    res.render("tripFolders/folderPage/editFolder", {
+      tripFolder: tripFolder,
+      user: user,
+    });
   } catch (err) {
     if (err === req.authError)
       res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
@@ -99,9 +106,12 @@ router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
   }
 });
 
+// Route to Update Trip Folder
 router.put("/:tripID", verifyToken, async (req, res) => {
+  let user = null;
   try {
     if (req.authError) throw req.authError;
+    user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     tripFolder.folderName = req.body.folderName;
     tripFolder.tripDate = req.body.tripDate;
@@ -113,6 +123,29 @@ router.put("/:tripID", verifyToken, async (req, res) => {
     else
       res.render("tripFolders/folderPage/editFolder", {
         errorMessage: "Error Updating Folder",
+        user: user,
+        tripFolder: tripFolder,
+      });
+  }
+});
+
+// Route to Delete Trip Folder
+router.delete("/:tripID", verifyToken, async (req, res) => {
+  let user = null;
+  try {
+    if (req.authError) throw req.authError;
+    user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(req.params.tripID);
+    await tripFolder.deleteOne();
+    res.redirect("/tripFolders");
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else
+      res.render("tripFolders/folderPage/show", {
+        tripFolder: tripFolder,
+        errorMessage: "Error Deleting Folder",
+        user: user,
       });
   }
 });
