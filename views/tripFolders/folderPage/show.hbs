@@ -1,0 +1,12 @@
+<div>
+  <h2>{{tripFolder.folderName}}</h2>
+  <a href="/tripFolders/{{tripFolder.id}}/editFolder">Edit Folder Information</a>
+</div>
+<div>
+  <h3>Users:
+    {{#each usernames}}{{this}} {{/each}}
+  </h3>
+  <a href="/tripFolders/{{tripFolder.id}}/addUser">Add User</a>
+</div>
+
+<a href="/tripFolders/{{tripFolder.id}}/addFile">Add Trip File</a>

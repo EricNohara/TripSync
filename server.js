@@ -24,6 +24,10 @@ const hbs = require("express-handlebars").create({
     getUserPath: (user) => {
       return user != null ? `/users/${user.id}` : "/";
     },
+    getDefaultDate: () => {
+      const date = new Date();
+      return date.toISOString().split("T")[0];
+    },
   },
 });
 

@@ -62,7 +62,7 @@ router.post("/create", verifyToken, async (req, res) => {
   }
 });
 
-router.get("/private/:tripID", verifyToken, async (req, res) => {
+router.get("/:tripID", verifyToken, async (req, res) => {
   try {
     if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
@@ -77,13 +77,43 @@ router.get("/private/:tripID", verifyToken, async (req, res) => {
         }
       })
     );
-    res.render("tripFolders/show", {
+    res.render("tripFolders/folderPage/show", {
       tripFolder: tripFolder,
       usernames: usernames,
       user: user,
     });
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  }
+});
+
+router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const tripFolder = await TripFolder.findById(req.params.tripID);
+    res.render("tripFolders/folderPage/editFolder", { tripFolder: tripFolder });
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else res.redirect(`/tripFolders/${req.params.tripID}`);
+  }
+});
+
+router.put("/:tripID", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const tripFolder = await TripFolder.findById(req.params.tripID);
+    tripFolder.folderName = req.body.folderName;
+    tripFolder.tripDate = req.body.tripDate;
+    await tripFolder.save();
+    res.redirect(`/tripFolders/${tripFolder.id}`);
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else
+      res.render("tripFolders/folderPage/editFolder", {
+        errorMessage: "Error Updating Folder",
+      });
   }
 });
 
