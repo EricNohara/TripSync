@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 const express = require("express");
 const methodOverride = require("method-override");
 const cookieParser = require("cookie-parser");
+const User = require("./models/user");
 const app = express();
 const port = 8080;
 

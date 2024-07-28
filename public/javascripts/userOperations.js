@@ -24,7 +24,7 @@ function verifyToken(req, res, next) {
   });
 }
 
-async function retrieveUser(req) {
+async function retrieveUser(req, res) {
   try {
     if (req.user == null) throw "Error: No User";
     return await User.findOne({ email: req.user.email });
