@@ -1,6 +1,6 @@
 {{> errorMessage}}
 {{#if user}}
-  <p>Welcome {{user.username}}!</p>
+  <p>Welcome {{user.username}}! This accout is Private: {{user.isPrivate}}.</p>
 {{else}}
   <a href="/users/login">Log In</a>
 {{/if}}

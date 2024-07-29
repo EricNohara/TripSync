@@ -34,6 +34,7 @@ async function getSearchableUsers(req) {
 
   if (!req.query.username || req.query.username === "") return [];
   else searchOptions.username = new RegExp(req.query.username, "i");
+  searchOptions.isPrivate = false;
 
   try {
     const users = await User.find(searchOptions).limit(10);

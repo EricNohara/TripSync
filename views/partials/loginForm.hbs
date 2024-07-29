@@ -1,13 +1,44 @@
 <form action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
-    <label>Username</label>
-    <input type="text" name="username" />
-  {{else}}
+  <div>
+    {{#if user}}
+        <label>Username</label>
+        <input type="text" name="username" value="{{user.username}}" required/>
+    {{else}}
+        <label>Username</label>
+        <input type="text" name="username" required />
+    {{/if}}
+  </div>
   {{/if}}
-  <label>Email</label>
-  <input type="text" name="email" />
-  <label>Password</label>
-  <input type="text" name="password" />
-  {{! <input type="password" name="password" /> }}
-  <button type="submit">{{loginOrRegister}}</button>
+  <div>
+    {{#if user}}
+      <label>Email</label>
+      <input type="text" name="email" value="{{user.email}}" required />
+    {{else}}
+      <label>Email</label>
+      <input type="text" name="email" required />
+    {{/if}}
+  </div>
+  <div>
+    <label>Password</label>
+    <input type="text" name="password" required />
+    {{! <input type="pasword" name="password" required /> }}
+  </div>
+  {{#if (isRegisterForm loginOrRegister)}}
+    <div>
+      <label>Account Type</label>
+      {{#if user}}
+        <input type="radio" name="isPrivate" value="true" {{#if user.isPrivate}}checked{{/if}} />Private
+        <input type="radio" name="isPrivate" value="false" {{#unless user.isPrivate}}checked{{/unless}} />Shared
+      {{else}}
+        <input type="radio" name="isPrivate" value="true" />Private
+        <input type="radio" name="isPrivate" value="false" checked />Shared
+      {{/if}}
+    </div>
+  {{/if}}
+  {{#if user}}
+    <button type="submit">Update</button>
+  {{else}}
+    <button type="submit">{{loginOrRegister}}</button>
+  {{/if}}
 </form>

@@ -7,6 +7,7 @@ const router = express.Router();
 const {
   verifyToken,
   getSearchableUsers,
+  retrieveUser,
 } = require("../public/javascripts/userOperations");
 
 // Home Page to Search for Users
@@ -53,7 +54,7 @@ router.post("/login", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.render("index", { user: user });
+    res.redirect("/");
   } catch (err) {
     res.render("users/login", { errorMessage: err });
   }
@@ -78,6 +79,7 @@ router.post("/register", async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
+      isPrivate: req.body.isPrivate === "false" ? false : true,
     });
 
     await newUser.save();
@@ -86,11 +88,61 @@ router.post("/register", async (req, res) => {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
-    res.render("index", { user: newUser });
+    res.redirect("/");
   } catch (err) {
     res.render("users/register", {
       errorMessage: err,
     });
+  }
+});
+
+// Edit User Info Route
+router.get("/edit", verifyToken, async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    res.render("users/edit", { user: user, errorMessage: errorMessage });
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else
+      res.redirect(
+        `/?errorMessage=${encodeURIComponent("Error editing user")}`
+      );
+  }
+});
+
+router.put("/edit", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    const existingUser = await User.findOne({
+      email: req.body.email,
+    });
+    if (existingUser && existingUser.email != user.email)
+      throw "Account with current email already exists!";
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    user.username = req.body.username;
+    user.email = req.body.email;
+    user.password = hashedPassword;
+    user.isPrivate = req.body.isPrivate === "false" ? false : true;
+    await user.save();
+    res.redirect("/");
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else if (err === "Account with current email already exists!") {
+      res.redirect(
+        `/users/edit?errorMessage=${encodeURIComponent(
+          "Account with current email already exists!"
+        )}`
+      );
+    } else {
+      res.redirect(
+        `/users/edit?errorMessage=${encodeURIComponent("Error updating user.")}`
+      );
+    }
   }
 });
 

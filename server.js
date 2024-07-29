@@ -28,6 +28,7 @@ const hbs = require("express-handlebars").create({
       const date = new Date();
       return date.toISOString().split("T")[0];
     },
+    isUserPrivate: (user) => {},
   },
 });
 

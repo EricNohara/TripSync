@@ -123,10 +123,12 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
     user = await retrieveUser(req, res);
+    if (user.isPrivate)
+      throw "User must be shared account to add users. Please update account information.";
     if (!req.body.addUsername || req.body.addUsername === "")
       throw "Error adding selected user";
     const addedUser = await User.findOne({ username: req.body.addUsername });
-    if (!addedUser) throw "Error adding selected user";
+    if (!addedUser || addedUser.isPrivate) throw "Error adding selected user";
     tripFolder.users.push(addedUser.id);
     tripFolder.isShared = true;
     await tripFolder.save();
@@ -134,7 +136,11 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
   } catch (err) {
     if (err === req.authError)
       res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else if (err === "Error adding selected user") {
+    else if (
+      err ===
+        "User must be shared account to add users. Please update account information." ||
+      err === "Error adding selected user"
+    ) {
       res.redirect(
         `/tripFolders/${
           req.params.tripID
@@ -232,12 +238,23 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
 
   if (user) {
     searchOptions.users = user.id;
+  } else {
+    res.redirect("/");
   }
 
   if (folderType === "private") {
     searchOptions.isShared = false;
   } else {
     searchOptions.isShared = true;
+  }
+
+  if (user.isPrivate === true) {
+    return res.render(`tripFolders/${folderType}`, {
+      user: user,
+      searchOptions: req.query,
+      errorMessage:
+        "User must be a shared account to access! Please update user information.",
+    });
   }
 
   try {
