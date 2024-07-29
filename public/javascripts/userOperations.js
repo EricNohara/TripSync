@@ -28,7 +28,23 @@ async function retrieveUser(req, res) {
   }
 }
 
+// helper function to load all users based on query
+async function getSearchableUsers(req) {
+  let searchOptions = {};
+
+  if (!req.query.username || req.query.username === "") return [];
+  else searchOptions.username = new RegExp(req.query.username, "i");
+
+  try {
+    const users = await User.find(searchOptions).limit(10);
+    return users;
+  } catch {
+    return null;
+  }
+}
+
 module.exports = {
   verifyToken,
   retrieveUser,
+  getSearchableUsers,
 };

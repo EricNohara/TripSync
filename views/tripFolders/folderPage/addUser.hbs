@@ -1,0 +1,22 @@
+<h2>Search Users</h2>
+{{> errorMessage}}
+<form action="/tripFolders/{{tripFolder.id}}/addUser" method="GET">
+  <label>Username</label>
+  <input type="text" name="username" value="{{searchOptions.username}}" />
+  <button type="submit">Search</button>
+</form>
+<br />
+{{#each users}}
+  <ul>
+    <li>
+      <form
+        method="POST"
+        action="/tripFolders/{{../tripFolder.id}}/addUser?_method=PUT"
+      >
+        <input type="hidden" name="addUsername" value="{{this.username}}" />
+        <label>{{this.username}}</label>
+        <button type="submit">Add</button>
+      </form>
+    </li>
+  </ul>
+{{/each}}

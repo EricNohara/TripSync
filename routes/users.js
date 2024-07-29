@@ -4,14 +4,22 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const router = express.Router();
-const { verifyToken } = require("../public/javascripts/userOperations");
+const {
+  verifyToken,
+  getSearchableUsers,
+} = require("../public/javascripts/userOperations");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
   try {
     if (req.authError) throw req.authError;
     const user = await User.findOne({ email: req.user.email });
-    loadSearchableUsers(req, res, user);
+    const users = await getSearchableUsers(req);
+    res.render("users/index", {
+      users: users,
+      user: user,
+      searchOptions: req.query,
+    });
   } catch (err) {
     if (err == req.authError) {
       res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
@@ -91,24 +99,5 @@ router.get("/logout", (req, res) => {
   res.clearCookie("token");
   res.redirect("/users/login");
 });
-
-// helper function to load all users based on query
-async function loadSearchableUsers(req, res, user = null) {
-  let searchOptions = {};
-  if (req.query.username != null && req.query.username !== "") {
-    searchOptions.username = new RegExp(req.query.username, "i");
-  }
-
-  try {
-    const users = await User.find(searchOptions);
-    res.render("users/index", {
-      users: users,
-      user: user,
-      searchOptions: req.query,
-    });
-  } catch {
-    res.redirect("/");
-  }
-}
 
 module.exports = router;
