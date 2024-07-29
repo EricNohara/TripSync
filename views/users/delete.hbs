@@ -1,0 +1,8 @@
+{{> errorMessage}}
+<form action="/users/delete?_method=DELETE" method="POST">
+    <label>Email</label>
+    <input type="text" name="email" required>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <button type="submit">Delete User</button>
+</form>

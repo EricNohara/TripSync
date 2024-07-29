@@ -152,4 +152,43 @@ router.get("/logout", (req, res) => {
   res.redirect("/users/login");
 });
 
+// Get Delete Route
+router.get("/delete", verifyToken, async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  try {
+    if (req.authError) throw req.authError;
+    res.render("users/delete", { errorMessage: errorMessage });
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// Delete User Route
+router.delete("/delete", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    const passwordMatch = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (req.body.email !== user.email) throw "Email Incorrect";
+    if (!passwordMatch) throw "Password Incorrect";
+    await user.deleteOne();
+    res.redirect("/users/logout");
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else if (err === "Email Incorrect" || err === "Password Incorrect") {
+      res.redirect(`/users/delete?errorMessage=${encodeURIComponent(err)}`);
+    } else {
+      res.redirect(
+        `/users/delete?errorMessage=${encodeURIComponent(
+          "Error deleting user"
+        )}`
+      );
+    }
+  }
+});
+
 module.exports = router;
