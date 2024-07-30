@@ -1,0 +1,12 @@
+<h2>Add File</h2>
+<form action="/tripFolders/{{tripFolder.id}}/addFile" method="POST">
+  <label>Title</label>
+  <input type="text" name="title" />
+  <label>Date</label>
+  <input type="date" name="userSetDate" value="{{getDefaultDate}}" />
+  <label>Description</label>
+  <textarea name="description"></textarea>
+  <label>Image</label>
+  <input type="file" name="image" class="filepond" />
+  <button type="submit">Add</button>
+</form>

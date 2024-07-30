@@ -1,14 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const TripFolder = require("../models/tripFolder");
+const TripFile = require("../models/tripFile");
 const User = require("../models/user");
 const {
   verifyToken,
   retrieveUser,
   getSearchableUsers,
 } = require("../public/javascripts/userOperations");
-const tripFolder = require("../models/tripFolder");
-const { verify } = require("jsonwebtoken");
+
+const imageMimeTypes = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/bmp",
+  "image/webp",
+  "image/tiff",
+  "image/svg+xml",
+];
 
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
@@ -71,6 +80,7 @@ router.post("/create", verifyToken, async (req, res) => {
 
 // Route to Show Trip Folder
 router.get("/:tripID", verifyToken, async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
@@ -85,10 +95,22 @@ router.get("/:tripID", verifyToken, async (req, res) => {
         }
       })
     );
+    let tripFiles = await Promise.all(
+      tripFolder.tripFiles.map(async (tripFileID) => {
+        try {
+          const curTripFile = await TripFile.findById(tripFileID);
+          return curTripFile;
+        } catch (err) {
+          console.error(err);
+        }
+      })
+    );
     res.render("tripFolders/folderPage/show", {
       tripFolder: tripFolder,
       usernames: usernames,
       user: user,
+      errorMessage: errorMessage,
+      tripFiles: tripFiles,
     });
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
@@ -124,11 +146,18 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     const tripFolder = await TripFolder.findById(req.params.tripID);
     user = await retrieveUser(req, res);
     if (user.isPrivate)
-      throw "User must be shared account to add users. Please update account information.";
+      throw "User must be a shared account to add users. Please update account information.";
     if (!req.body.addUsername || req.body.addUsername === "")
       throw "Error adding selected user";
     const addedUser = await User.findOne({ username: req.body.addUsername });
-    if (!addedUser || addedUser.isPrivate) throw "Error adding selected user";
+    if (tripFolder.users.indexOf(addedUser.id) > -1)
+      throw "User selected is already added to current folder.";
+    if (
+      !addedUser ||
+      addedUser.isPrivate ||
+      addedUser.username === user.username
+    )
+      throw "Error adding selected user";
     tripFolder.users.push(addedUser.id);
     tripFolder.isShared = true;
     await tripFolder.save();
@@ -139,7 +168,8 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     else if (
       err ===
         "User must be shared account to add users. Please update account information." ||
-      err === "Error adding selected user"
+      err === "Error adding selected user" ||
+      err === "User selected is already added to current folder."
     ) {
       res.redirect(
         `/tripFolders/${
@@ -149,6 +179,29 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     } else {
       res.redirect("/tripFolders");
     }
+  }
+});
+
+// Route to Remove User from Folder
+router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(req.params.tripId);
+    const index = tripFolder.users.indexOf(user.id);
+    console.log(index);
+    if (index > -1) tripFolder.users.splice(index, 1);
+    else throw "Error removing user from trip folder";
+    if (tripFolder.users.length === 1) tripFolder.isShared = false;
+    await tripFolder.save();
+    res.redirect("/tripFolders");
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else
+      res.redirect(
+        `/tripFolders/${tripFolder.id}?errorMessage=${encodeURIComponent(err)}`
+      );
   }
 });
 
@@ -213,6 +266,62 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
   }
 });
 
+// Route to Render Add Trip File
+router.get("/:tripID/addFile", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(req.params.tripID);
+    res.render("tripFiles/addFile", {
+      tripFolder: tripFolder,
+      user: user,
+    });
+  } catch (err) {
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else {
+      res.render("tripFolders/folderPage/show", {
+        tripFolder: tripFolder,
+        errorMessage: "Cannot add file at this time",
+        user: user,
+      });
+    }
+  }
+});
+
+router.post("/:tripID/addFile", verifyToken, async (req, res) => {
+  try {
+    if (req.authError) throw req.authError;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(req.params.tripID);
+    const tripFile = new TripFile({
+      title: req.body.title,
+      description: req.body.description,
+      userSetDate: req.body.userSetDate,
+      uploadedBy: user.id,
+    });
+
+    saveImage(tripFile, req.body.image);
+
+    const newTripFile = await tripFile.save();
+    tripFolder.tripFiles.push(newTripFile.id);
+    await tripFolder.save();
+
+    res.redirect(`/tripFolders/${tripFolder.id}`);
+  } catch (err) {
+    console.error(err);
+    if (err === req.authError)
+      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    else {
+      res.render("tripFolders/folderPage/show", {
+        tripFolder: tripFolder,
+        errorMessage: "Cannot add file at this time",
+        user: user,
+      });
+    }
+  }
+});
+
 async function retrieveUserAndRedirect(
   req,
   res,
@@ -266,6 +375,15 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
     });
   } catch {
     res.redirect("/");
+  }
+}
+
+function saveImage(tripFolder, imgEncoded) {
+  if (imgEncoded == null) return;
+  const image = JSON.parse(imgEncoded);
+  if (image != null && imageMimeTypes.includes(image.type)) {
+    tripFolder.image = new Buffer.from(image.data, "base64");
+    tripFolder.imageType = image.type;
   }
 }
 
