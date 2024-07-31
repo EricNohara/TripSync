@@ -25,7 +25,7 @@
   </li>
 </ul>
 {{#each tripFiles}}
-  <a href="/tripFolders/{{tripFolder.id}}/${{this.id}}">
-    <img src="{{this.imagePath}}" alt="{{this.title}}">
+  <a href="/tripFolders/{{../tripFolder.id}}/{{this.id}}">
+    <img src="{{this.imagePath}}" alt="{{this.title}}" height="150" width="100">
   </a>
 {{/each}}

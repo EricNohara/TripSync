@@ -1,0 +1,15 @@
+<h2>{{#if tripFile.title}}{{tripFile.title}} - {{/if}}{{uploadedBy}}</h2>
+<h3>Date: {{convertReadableDate tripFile.userSetDate}}</h3>
+<img
+  src="{{tripFile.imagePath}}"
+  alt="{{tripFile.title}}"
+  height="150"
+  width="100"
+/>
+{{#if tripFile.description}}
+  <div>
+    <h3>Description: </h3>{{tripFile.description}}
+  </div>
+{{/if}}
+<a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile">Edit</a>
+<a href="/tripFolders/{{tripFolder.id}}">Return</a>

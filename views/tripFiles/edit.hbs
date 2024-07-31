@@ -1,0 +1,28 @@
+<h2>Edit Trip File</h2>
+{{> errorMessage}}
+<form
+  action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=PUT"
+  method="POST"
+>
+  <label>Title</label>
+  <input type="text" name="title" value="{{tripFile.title}}" />
+  <label>Date</label>
+  <input
+    type="date"
+    name="userSetDate"
+    value="{{convertReadableDate tripFile.userSetDate}}"
+    required
+  />
+  <label>Description</label>
+  <textarea name="description">{{tripFile.description}}</textarea>
+  <label>Image</label>
+  <input type="file" name="image" class="filepond" />
+  <button type="submit">Update</button>
+</form>
+<form
+  action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=DELETE"
+  method="POST"
+>
+    <button type="submit">Delete</button>
+</form>
+<a href="/tripFolders/{{tripFolder.id}}">Return</a>

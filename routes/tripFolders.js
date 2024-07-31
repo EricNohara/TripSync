@@ -13,6 +13,7 @@ const {
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
+const { verify } = require("jsonwebtoken");
 
 const imageMimeTypes = [
   "image/jpeg",
@@ -226,6 +227,7 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
     user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     await tripFolder.deleteOne();
+    tripFolder.tripFiles;
     res.redirect("/tripFolders");
   } catch (err) {
     res.render("tripFolders/folderPage/show", {
@@ -256,7 +258,6 @@ router.get("/:tripID/addFile", verifyToken, async (req, res) => {
 
 router.post("/:tripID/addFile", verifyToken, async (req, res) => {
   try {
-    // if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     const tripFile = new TripFile({
@@ -281,6 +282,97 @@ router.post("/:tripID/addFile", verifyToken, async (req, res) => {
     });
   }
 });
+
+router.get("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  try {
+    const { tripID, fileID } = req.params;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(tripID);
+    const tripFile = await TripFile.findById(fileID);
+    res.render("tripFiles/edit", {
+      user: user,
+      tripFolder: tripFolder,
+      tripFile: tripFile,
+      errorMessage: errorMessage,
+    });
+  } catch (err) {
+    err = setWildcardError(err, "Error Editing Trip File");
+    res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
+  }
+});
+
+router.put("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
+  const { tripID, fileID } = req.params;
+  try {
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(tripID);
+    const tripFile = await TripFile.findById(fileID);
+    await verifyUserTripFile(tripFile, user);
+
+    tripFile.title = req.body.title === "" ? null : req.body.title;
+    tripFile.description =
+      req.body.description === "" ? null : req.body.description;
+    if (req.body.image) saveImage(tripFile, req.body.image);
+    tripFile.userSetDate = req.body.userSetDate;
+    await tripFile.save();
+    res.redirect(`/tripFolders/${tripFolder.id}/${tripFile.id}`);
+  } catch (err) {
+    err = setWildcardError(err, "Error Editing Trip File");
+    res.redirect(
+      queryAppendError(`/tripFolders/${tripID}/${fileID}/editFile`, err)
+    );
+  }
+});
+
+router.delete("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
+  const { tripID, fileID } = req.params;
+  try {
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(tripID);
+    const tripFile = await TripFile.findById(fileID);
+    await verifyUserTripFile(tripFile, user);
+    const index = tripFolder.tripFiles.indexOf(tripFile.id);
+    if (index > -1) tripFolder.tripFiles.splice(index, 1);
+    else throw new CustomErr("Error removing file from trip folder");
+    await tripFolder.save();
+    await tripFile.deleteOne();
+    res.redirect(`/tripFolders/${tripFolder.id}`);
+  } catch (err) {
+    err = setWildcardError(err, "Error Deleting Trip File");
+    res.redirect(
+      queryAppendError(`/tripFolders/${tripID}/${fileID}/editFile`, err)
+    );
+  }
+});
+
+router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
+  try {
+    const { tripID, fileID } = req.params;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(tripID);
+    const tripFile = await TripFile.findById(fileID);
+    const uploadedBy = await User.findById(tripFile.uploadedBy);
+
+    res.render("tripFiles/show", {
+      tripFolder: tripFolder,
+      user: user,
+      tripFile: tripFile,
+      uploadedBy: uploadedBy.username,
+    });
+  } catch (err) {
+    err = setWildcardError(err, "Error Displaying Trip File");
+    res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
+  }
+});
+
+async function verifyUserTripFile(tripFile, user) {
+  const uploadedBy = await User.findById(tripFile.uploadedBy);
+  if (user.username !== uploadedBy.username)
+    throw new CustomErr(
+      "Error: only original uploader may edit file information"
+    );
+}
 
 async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
@@ -328,12 +420,12 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
   }
 }
 
-function saveImage(tripFolder, imgEncoded) {
+function saveImage(tripFile, imgEncoded) {
   if (imgEncoded == null) return;
   const image = JSON.parse(imgEncoded);
   if (image != null && imageMimeTypes.includes(image.type)) {
-    tripFolder.image = new Buffer.from(image.data, "base64");
-    tripFolder.imageType = image.type;
+    tripFile.image = new Buffer.from(image.data, "base64");
+    tripFile.imageType = image.type;
   }
 }
 
