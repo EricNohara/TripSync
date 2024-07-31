@@ -133,10 +133,20 @@ router.put("/edit", verifyToken, async (req, res) => {
     const existingUserByUsername = await User.findOne({
       username: req.body.username,
     });
-    if (existingUserByUsername && existingUserByUsername !== user.username)
+    if (
+      existingUserByUsername &&
+      existingUserByUsername.username !== user.username
+    )
       throw new CustomErr("Account with inputted username already exists");
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const passwordMatch = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (!passwordMatch)
+      throw new CustomErr("Password incorrect: Cannot edit user information");
+
+    const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
     user.username = req.body.username;
     user.email = req.body.email;
     user.password = hashedPassword;

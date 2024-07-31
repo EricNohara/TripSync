@@ -20,10 +20,16 @@
     {{/if}}
   </div>
   <div>
-    <label>Password</label>
-    <input type="text" name="password" required />
+      <label>{{#if user}}Current Password{{else}}Password{{/if}}</label>
+      <input type="text" name="password" required>
     {{! <input type="pasword" name="password" required /> }}
   </div>
+  {{#if user}}
+    <div>
+      <label>Updated Password</label>
+      <input type="text" name="newPassword" required />
+    </div>
+  {{/if}}
   {{#if (isRegisterForm loginOrRegister)}}
     <div>
       <label>Account Type</label>
