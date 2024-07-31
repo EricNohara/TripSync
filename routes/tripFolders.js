@@ -22,49 +22,44 @@ const imageMimeTypes = [
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     await retrieveUserAndRedirect(req, res, "index");
-  } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  } catch {
+    res.redirect("/");
   }
 });
 
 // Route to Display Private Folders
 router.get("/private", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     await loadSearchableFolders(req, res, user, "private");
-  } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  } catch {
+    res.redirect("/");
   }
 });
 
 // Route to Display Shared Folders
 router.get("/shared", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     await loadSearchableFolders(req, res, user, "shared");
-  } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  } catch {
+    res.redirect("/");
   }
 });
 
 // Route to Create New Folder
 router.get("/create", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     await retrieveUserAndRedirect(req, res, "create");
-  } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  } catch {
+    res.redirect("/");
   }
 });
 
 // Route to Add New Folder to Database
 router.post("/create", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = new TripFolder({
       folderName: req.body.folderName,
@@ -73,8 +68,12 @@ router.post("/create", verifyToken, async (req, res) => {
     });
     const newTripFolder = await tripFolder.save();
     res.redirect(`/tripFolders/${newTripFolder.id}`);
-  } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+  } catch {
+    res.redirect(
+      `/tripFolders/create?errorMessage=${encodeURIComponent(
+        "Error Creating Folder"
+      )}`
+    );
   }
 });
 
@@ -82,7 +81,6 @@ router.post("/create", verifyToken, async (req, res) => {
 router.get("/:tripID", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
-    if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
     const user = await retrieveUser(req, res);
     let usernames = await Promise.all(
@@ -101,7 +99,7 @@ router.get("/:tripID", verifyToken, async (req, res) => {
           const curTripFile = await TripFile.findById(tripFileID);
           return curTripFile;
         } catch (err) {
-          console.error(err);
+          return null;
         }
       })
     );
@@ -113,7 +111,8 @@ router.get("/:tripID", verifyToken, async (req, res) => {
       tripFiles: tripFiles,
     });
   } catch (err) {
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    console.error(err);
+    res.redirect("/");
   }
 });
 
@@ -121,7 +120,6 @@ router.get("/:tripID", verifyToken, async (req, res) => {
 router.get("/:tripID/addUser", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const users = await getSearchableUsers(req);
     const tripFolder = await TripFolder.findById(req.params.tripID);
@@ -132,9 +130,8 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
       errorMessage: errorMessage,
     });
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else res.redirect(`/tripFolders/${req.params.tripID}`);
+    console.error(err);
+    res.redirect(`/tripFolders/${req.params.tripID}`);
   }
 });
 
@@ -142,7 +139,6 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
 router.put("/:tripID/addUser", verifyToken, async (req, res) => {
   let user = null;
   try {
-    if (req.authError) throw req.authError;
     const tripFolder = await TripFolder.findById(req.params.tripID);
     user = await retrieveUser(req, res);
     if (user.isPrivate)
@@ -163,29 +159,17 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     await tripFolder.save();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else if (
-      err ===
-        "User must be shared account to add users. Please update account information." ||
-      err === "Error adding selected user" ||
-      err === "User selected is already added to current folder."
-    ) {
-      res.redirect(
-        `/tripFolders/${
-          req.params.tripID
-        }/addUser?errorMessage=${encodeURIComponent(err)}`
-      );
-    } else {
-      res.redirect("/tripFolders");
-    }
+    res.redirect(
+      `/tripFolders/${
+        req.params.tripID
+      }/addUser?errorMessage=${encodeURIComponent(err)}`
+    );
   }
 });
 
 // Route to Remove User from Folder
 router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripId);
     const index = tripFolder.users.indexOf(user.id);
@@ -196,19 +180,17 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     await tripFolder.save();
     res.redirect("/tripFolders");
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else
-      res.redirect(
-        `/tripFolders/${tripFolder.id}?errorMessage=${encodeURIComponent(err)}`
-      );
+    res.redirect(
+      `/tripFolders/${req.params.tripID}?errorMessage=${encodeURIComponent(
+        err
+      )}`
+    );
   }
 });
 
 // Route to Edit Trip Folder
 router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     res.render("tripFolders/folderPage/editFolder", {
@@ -216,9 +198,7 @@ router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
       user: user,
     });
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else res.redirect(`/tripFolders/${req.params.tripID}`);
+    res.redirect(`/tripFolders/${req.params.tripID}`);
   }
 });
 
@@ -226,7 +206,6 @@ router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
 router.put("/:tripID", verifyToken, async (req, res) => {
   let user = null;
   try {
-    if (req.authError) throw req.authError;
     user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     tripFolder.folderName = req.body.folderName;
@@ -234,14 +213,11 @@ router.put("/:tripID", verifyToken, async (req, res) => {
     await tripFolder.save();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else
-      res.render("tripFolders/folderPage/editFolder", {
-        errorMessage: "Error Updating Folder",
-        user: user,
-        tripFolder: tripFolder,
-      });
+    res.render("tripFolders/folderPage/editFolder", {
+      errorMessage: "Error Updating Folder",
+      user: user,
+      tripFolder: tripFolder,
+    });
   }
 });
 
@@ -249,27 +225,22 @@ router.put("/:tripID", verifyToken, async (req, res) => {
 router.delete("/:tripID", verifyToken, async (req, res) => {
   let user = null;
   try {
-    if (req.authError) throw req.authError;
     user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     await tripFolder.deleteOne();
     res.redirect("/tripFolders");
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else
-      res.render("tripFolders/folderPage/show", {
-        tripFolder: tripFolder,
-        errorMessage: "Error Deleting Folder",
-        user: user,
-      });
+    res.render("tripFolders/folderPage/show", {
+      tripFolder: tripFolder,
+      errorMessage: "Error Deleting Folder",
+      user: user,
+    });
   }
 });
 
 // Route to Render Add Trip File
 router.get("/:tripID/addFile", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     res.render("tripFiles/addFile", {
@@ -277,21 +248,17 @@ router.get("/:tripID/addFile", verifyToken, async (req, res) => {
       user: user,
     });
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else {
-      res.render("tripFolders/folderPage/show", {
-        tripFolder: tripFolder,
-        errorMessage: "Cannot add file at this time",
-        user: user,
-      });
-    }
+    res.render("tripFolders/folderPage/show", {
+      tripFolder: tripFolder,
+      errorMessage: "Cannot add file at this time",
+      user: user,
+    });
   }
 });
 
 router.post("/:tripID/addFile", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
+    // if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
     const tripFile = new TripFile({
@@ -309,30 +276,22 @@ router.post("/:tripID/addFile", verifyToken, async (req, res) => {
 
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
-    console.error(err);
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else {
-      res.render("tripFolders/folderPage/show", {
-        tripFolder: tripFolder,
-        errorMessage: "Cannot add file at this time",
-        user: user,
-      });
-    }
+    res.render("tripFolders/folderPage/show", {
+      tripFolder: tripFolder,
+      errorMessage: "Cannot add file at this time",
+      user: user,
+    });
   }
 });
 
-async function retrieveUserAndRedirect(
-  req,
-  res,
-  redirectRoute,
-  tripFolders = null
-) {
+async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     const user = await retrieveUser(req, res);
-    res.render(`tripFolders/${redirectRoute}`, {
+    res.render(`tripFolders/${route}`, {
       user: user,
       tripFolders: tripFolders,
+      errorMessage: errorMessage,
     });
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);

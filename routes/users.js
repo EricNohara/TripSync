@@ -8,13 +8,17 @@ const {
   verifyToken,
   getSearchableUsers,
   retrieveUser,
+  isAlphaNumeric,
 } = require("../public/javascripts/userOperations");
+const {
+  CustomErr,
+  setWildcardError,
+} = require("../public/javascripts/customErrors");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
-    const user = await User.findOne({ email: req.user.email });
+    const user = await retrieveUser(req, res);
     const users = await getSearchableUsers(req);
     res.render("users/index", {
       users: users,
@@ -22,11 +26,7 @@ router.get("/", verifyToken, async (req, res) => {
       searchOptions: req.query,
     });
   } catch (err) {
-    if (err == req.authError) {
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    } else {
-      res.redirect("/");
-    }
+    res.redirect("/");
   }
 });
 
@@ -40,22 +40,23 @@ router.post("/login", async (req, res) => {
   try {
     // Find user by inputted email
     const user = await User.findOne({ email: req.body.email });
-    if (!user) throw "Invalid Email";
+    if (!user) throw new CustomErr("Invalid Email");
 
     // Authenticate inputted password
     const passwordMatch = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    if (!passwordMatch) throw "Password Incorrect";
+    if (!passwordMatch) throw new CustomErr("Password Incorrect");
 
     // Generate JWT token
-    const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect("/");
   } catch (err) {
+    err = setWildcardError(err, "Error: Something went wrong");
     res.render("users/login", { errorMessage: err });
   }
 });
@@ -68,10 +69,20 @@ router.get("/register", (req, res) => {
 // Create User Route
 router.post("/register", async (req, res) => {
   try {
-    const existingUser = await User.findOne({
+    if (!isAlphaNumeric(req.body.username))
+      throw new CustomErr("Username must contain only alphanumeric characters");
+
+    const existingUserByEmail = await User.findOne({
       email: req.body.email,
     });
-    if (existingUser) throw "Account with current email already exists!";
+    if (existingUserByEmail)
+      throw new CustomErr("Account with current email already exists!");
+
+    const existingUserByUsername = await User.findOne({
+      username: req.body.username,
+    });
+    if (existingUserByUsername && existingUserByUsername !== user.username)
+      throw new CustomErr("Account with current username already exists");
 
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -84,15 +95,14 @@ router.post("/register", async (req, res) => {
 
     await newUser.save();
     // Generate JWT token
-    const token = jwt.sign({ email: newUser.email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userID: newUser.id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect("/");
   } catch (err) {
-    res.render("users/register", {
-      errorMessage: err,
-    });
+    err = setWildcardError(err, "Error: Something went wrong");
+    res.render("users/register", { errorMessage: err });
   }
 });
 
@@ -100,28 +110,32 @@ router.post("/register", async (req, res) => {
 router.get("/edit", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     res.render("users/edit", { user: user, errorMessage: errorMessage });
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else
-      res.redirect(
-        `/?errorMessage=${encodeURIComponent("Error editing user")}`
-      );
+    err = setWildcardError(err, "Error editing user");
+    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
 router.put("/edit", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
+    if (!isAlphaNumeric(req.body.username))
+      throw new CustomErr("Username must contain only alphanumeric characters");
+
     const user = await retrieveUser(req, res);
-    const existingUser = await User.findOne({
+    const existingUserByEmail = await User.findOne({
       email: req.body.email,
     });
-    if (existingUser && existingUser.email != user.email)
-      throw "Account with current email already exists!";
+    if (existingUserByEmail && existingUserByEmail.email !== user.email)
+      throw new CustomErr("Account with inputted email already exists");
+
+    const existingUserByUsername = await User.findOne({
+      username: req.body.username,
+    });
+    if (existingUserByUsername && existingUserByUsername !== user.username)
+      throw new CustomErr("Account with inputted username already exists");
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     user.username = req.body.username;
     user.email = req.body.email;
@@ -130,19 +144,8 @@ router.put("/edit", verifyToken, async (req, res) => {
     await user.save();
     res.redirect("/");
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else if (err === "Account with current email already exists!") {
-      res.redirect(
-        `/users/edit?errorMessage=${encodeURIComponent(
-          "Account with current email already exists!"
-        )}`
-      );
-    } else {
-      res.redirect(
-        `/users/edit?errorMessage=${encodeURIComponent("Error updating user.")}`
-      );
-    }
+    err = setWildcardError(err, "Error updating user");
+    res.redirect(`/users/edit?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
@@ -156,38 +159,28 @@ router.get("/logout", (req, res) => {
 router.get("/delete", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
-    if (req.authError) throw req.authError;
-    res.render("users/delete", { errorMessage: errorMessage });
-  } catch (err) {
-    console.error(err);
+    const user = await retrieveUser(req, res);
+    res.render("users/delete", { errorMessage: errorMessage, user: user });
+  } catch {
+    res.redirect("/");
   }
 });
 
 // Delete User Route
 router.delete("/delete", verifyToken, async (req, res) => {
   try {
-    if (req.authError) throw req.authError;
     const user = await retrieveUser(req, res);
     const passwordMatch = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    if (req.body.email !== user.email) throw "Email Incorrect";
-    if (!passwordMatch) throw "Password Incorrect";
+    if (req.body.email !== user.email) throw new CustomErr("Email Incorrect");
+    if (!passwordMatch) throw new CustomErr("Password Incorrect");
     await user.deleteOne();
     res.redirect("/users/logout");
   } catch (err) {
-    if (err === req.authError)
-      res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
-    else if (err === "Email Incorrect" || err === "Password Incorrect") {
-      res.redirect(`/users/delete?errorMessage=${encodeURIComponent(err)}`);
-    } else {
-      res.redirect(
-        `/users/delete?errorMessage=${encodeURIComponent(
-          "Error deleting user"
-        )}`
-      );
-    }
+    err = setWildcardError(err, "Error deleting user");
+    res.redirect(`/users/delete?errorMessage=${encodeURIComponent(err)}`);
   }
 });
 
