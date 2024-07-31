@@ -3,6 +3,8 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const TripFolder = require("../models/tripFolder");
+const TripFile = require("../models/tripFile");
 const router = express.Router();
 const {
   verifyToken,
@@ -187,6 +189,31 @@ router.delete("/delete", verifyToken, async (req, res) => {
     );
     if (req.body.email !== user.email) throw new CustomErr("Email Incorrect");
     if (!passwordMatch) throw new CustomErr("Password Incorrect");
+
+    const userFolders = await TripFolder.find({ users: user.id });
+    // Delete user from all folders and remove all files user uploaded to those folders
+    for (const folder of userFolders) {
+      const userFilesInFolder = await TripFile.find({
+        _id: { $in: folder.tripFiles },
+        uploadedBy: user.id,
+      });
+
+      for (const file of userFilesInFolder) {
+        const index = folder.tripFiles.indexOf(file.id);
+        if (index > -1) {
+          folder.tripFiles.splice(index, 1);
+          await folder.save();
+        }
+        await file.deleteOne();
+      }
+
+      const index = folder.users.indexOf(user.id);
+      if (index > -1) {
+        folder.users.splice(index, 1);
+        await folder.save();
+      }
+    }
+
     await user.deleteOne();
     res.redirect("/users/logout");
   } catch (err) {

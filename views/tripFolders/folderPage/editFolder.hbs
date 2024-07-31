@@ -1,8 +1,18 @@
 <h2>Edit Trip Folder</h2>
 <form action="/tripFolders/{{tripFolder.id}}?_method=PUT" method="POST">
   <label>Trip Folder Name</label>
-  <input type="text" name="folderName" required />
+  <input
+    type="text"
+    name="folderName"
+    value="{{tripFolder.folderName}}"
+    required
+  />
   <label>Trip Date</label>
-  <input type="date" name="tripDate" value="{{getDefaultDate}}" required />
+  <input
+    type="date"
+    name="tripDate"
+    value="{{getDefaultDate tripFolder.tripDate}}"
+    required
+  />
   <button type="submit">Update</button>
 </form>
