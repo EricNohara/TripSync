@@ -13,6 +13,7 @@ const {
 const {
   CustomErr,
   setWildcardError,
+  queryAppendError,
 } = require("../public/javascripts/customErrors");
 
 // Home Page to Search for Users
@@ -57,7 +58,7 @@ router.post("/login", async (req, res) => {
     res.redirect("/");
   } catch (err) {
     err = setWildcardError(err, "Error: Something went wrong");
-    res.render("users/login", { errorMessage: err });
+    res.render("users/login", { errorMessage: err.message });
   }
 });
 
@@ -102,7 +103,7 @@ router.post("/register", async (req, res) => {
     res.redirect("/");
   } catch (err) {
     err = setWildcardError(err, "Error: Something went wrong");
-    res.render("users/register", { errorMessage: err });
+    res.render("users/register", { errorMessage: err.message });
   }
 });
 
@@ -114,7 +115,7 @@ router.get("/edit", verifyToken, async (req, res) => {
     res.render("users/edit", { user: user, errorMessage: errorMessage });
   } catch (err) {
     err = setWildcardError(err, "Error editing user");
-    res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
+    res.redirect(queryAppendError("/", err));
   }
 });
 
@@ -155,7 +156,7 @@ router.put("/edit", verifyToken, async (req, res) => {
     res.redirect("/");
   } catch (err) {
     err = setWildcardError(err, "Error updating user");
-    res.redirect(`/users/edit?errorMessage=${encodeURIComponent(err)}`);
+    res.redirect(queryAppendError("/users/edit", err));
   }
 });
 
@@ -190,7 +191,7 @@ router.delete("/delete", verifyToken, async (req, res) => {
     res.redirect("/users/logout");
   } catch (err) {
     err = setWildcardError(err, "Error deleting user");
-    res.redirect(`/users/delete?errorMessage=${encodeURIComponent(err)}`);
+    res.redirect(queryAppendError("/users/delete", err));
   }
 });
 

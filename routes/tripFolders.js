@@ -8,6 +8,11 @@ const {
   retrieveUser,
   getSearchableUsers,
 } = require("../public/javascripts/userOperations");
+const {
+  CustomErr,
+  setWildcardError,
+  queryAppendError,
+} = require("../public/javascripts/customErrors");
 
 const imageMimeTypes = [
   "image/jpeg",
@@ -70,9 +75,7 @@ router.post("/create", verifyToken, async (req, res) => {
     res.redirect(`/tripFolders/${newTripFolder.id}`);
   } catch {
     res.redirect(
-      `/tripFolders/create?errorMessage=${encodeURIComponent(
-        "Error Creating Folder"
-      )}`
+      queryAppendError("/tripFolders/create", "Error creating folder")
     );
   }
 });
@@ -142,27 +145,26 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     const tripFolder = await TripFolder.findById(req.params.tripID);
     user = await retrieveUser(req, res);
     if (user.isPrivate)
-      throw "User must be a shared account to add users. Please update account information.";
+      throw new CustomErr("User must be a shared account to add other users");
     if (!req.body.addUsername || req.body.addUsername === "")
-      throw "Error adding selected user";
+      throw new CustomErr("Error adding selected user");
     const addedUser = await User.findOne({ username: req.body.addUsername });
     if (tripFolder.users.indexOf(addedUser.id) > -1)
-      throw "User selected is already added to current folder.";
-    if (
-      !addedUser ||
-      addedUser.isPrivate ||
-      addedUser.username === user.username
-    )
-      throw "Error adding selected user";
+      throw new CustomErr("Selected user already added to the current folder");
+    if (!addedUser) throw new CustomErr("Error adding selected user");
+    if (addedUser.isPrivate)
+      throw new CustomErr("Selected user is private account");
+    if (addedUser.username === user.username)
+      throw new CustomErr("Error: Cannot add self to folder");
+
     tripFolder.users.push(addedUser.id);
     tripFolder.isShared = true;
     await tripFolder.save();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
+    err = setWildcardError(err, "Error adding selected user");
     res.redirect(
-      `/tripFolders/${
-        req.params.tripID
-      }/addUser?errorMessage=${encodeURIComponent(err)}`
+      queryAppendError(`/tripFolders/${req.params.tripID}/addUser`, err)
     );
   }
 });
@@ -173,18 +175,14 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripId);
     const index = tripFolder.users.indexOf(user.id);
-    console.log(index);
     if (index > -1) tripFolder.users.splice(index, 1);
-    else throw "Error removing user from trip folder";
+    else throw new CustomErr("Error removing user from trip folder");
     if (tripFolder.users.length === 1) tripFolder.isShared = false;
     await tripFolder.save();
     res.redirect("/tripFolders");
   } catch (err) {
-    res.redirect(
-      `/tripFolders/${req.params.tripID}?errorMessage=${encodeURIComponent(
-        err
-      )}`
-    );
+    err = setWildcardError(err, "Error removing user from trip folder");
+    res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
   }
 });
 
@@ -300,21 +298,14 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
 
 async function loadSearchableFolders(req, res, user = null, folderType) {
   let searchOptions = {};
-  if (req.query.folderName != null && req.query.folderName !== "") {
+  if (req.query.folderName != null && req.query.folderName !== "")
     searchOptions.folderName = new RegExp(req.query.folderName, "i");
-  }
 
-  if (user) {
-    searchOptions.users = user.id;
-  } else {
-    res.redirect("/");
-  }
+  if (user) searchOptions.users = user.id;
+  else res.redirect("/");
 
-  if (folderType === "private") {
-    searchOptions.isShared = false;
-  } else {
-    searchOptions.isShared = true;
-  }
+  if (folderType === "private") searchOptions.isShared = false;
+  else searchOptions.isShared = true;
 
   if (user.isPrivate === true) {
     return res.render(`tripFolders/${folderType}`, {

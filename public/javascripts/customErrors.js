@@ -10,4 +10,8 @@ function setWildcardError(error, errorMessage = "") {
   return error;
 }
 
-module.exports = { CustomErr, setWildcardError };
+function queryAppendError(path, error) {
+  return `${path}?errorMessage=${encodeURIComponent(error.message)}`;
+}
+
+module.exports = { CustomErr, setWildcardError, queryAppendError };
