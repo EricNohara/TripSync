@@ -31,6 +31,12 @@ const hbs = require("express-handlebars").create({
     convertReadableDate: (date) => {
       return date.toISOString().split("T")[0];
     },
+    folderIsNotEmpty: (tripFolder) => {
+      return tripFolder.tripFiles.length > 0 ? true : false;
+    },
+    equals: (a, b) => {
+      return a === b;
+    },
   },
 });
 

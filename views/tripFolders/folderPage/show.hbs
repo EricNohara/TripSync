@@ -1,12 +1,10 @@
-<div>
-  <h2>{{tripFolder.folderName}}</h2>
-  <a href="/tripFolders/{{tripFolder.id}}/editFolder">Edit Folder Information</a>
-</div>
+<h2>{{tripFolder.folderName}}</h2>
 <h3>Users:
   {{#each usernames}}{{this}} {{/each}}
 </h3>
 {{> errorMessage}}
 <ul>
+  <li><a href="/tripFolders/{{tripFolder.id}}/editFolder">Edit Folder Information</a></li>
   <li><a href="/tripFolders/{{tripFolder.id}}/addUser">Add User</a></li>
   <li><a href="/tripFolders/{{tripFolder.id}}/addFile">Add Trip File</a></li>
   <li>
@@ -23,6 +21,27 @@
       </form>
     {{/if}}
   </li>
+  {{#if (folderIsNotEmpty tripFolder)}}
+  <li>
+    <form action="/tripFolders/{{tripFolder.id}}" method="GET">
+      <label>Sort by</label>
+      <select name="sortBy">
+        <option value="">-- Select Option --</option>
+        <option value="setDate" {{#if (equals sortBy "setDate")}}selected{{/if}}>Date</option>
+        <option value="uploadDate" {{#if (equals sortBy "uploadDate")}}selected{{/if}}>Upload Date</option>
+        <option value="title" {{#if (equals sortBy "title")}}selected{{/if}}>Title</option>
+      </select>
+      <label>Filter by User</label>
+      <select name="filterUser">
+        <option value="">-- Select User --</option>
+        {{#each usernames}}
+          <option value="{{this}}" {{#if (equals ../filterUser this)}}selected{{/if}}>{{this}}</option>
+        {{/each}}
+      </select>
+      <button type="submit">Filter</button>
+    </form>
+  </li>
+  {{/if}}
 </ul>
 {{#each tripFiles}}
   <a href="/tripFolders/{{../tripFolder.id}}/{{this.id}}">

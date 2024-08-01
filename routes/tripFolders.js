@@ -84,6 +84,8 @@ router.post("/create", verifyToken, async (req, res) => {
 // Route to Show Trip Folder
 router.get("/:tripID", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  const sortBy = req.query.sortBy ? req.query.sortBy : null;
+  const filterUser = req.query.filterUser ? req.query.filterUser : null;
   try {
     const tripFolder = await TripFolder.findById(req.params.tripID);
     const user = await retrieveUser(req, res);
@@ -97,25 +99,33 @@ router.get("/:tripID", verifyToken, async (req, res) => {
         }
       })
     );
+
     let tripFiles = await Promise.all(
       tripFolder.tripFiles.map(async (tripFileID) => {
         try {
           const curTripFile = await TripFile.findById(tripFileID);
+          const uploadedBy = await User.findById(curTripFile.uploadedBy);
+          if (!curTripFile || !uploadedBy) return null;
+          if (filterUser && filterUser !== uploadedBy.username) return null;
           return curTripFile;
-        } catch (err) {
+        } catch {
           return null;
         }
       })
     );
+    tripFiles = tripFiles.filter((tripFile) => tripFile != null);
+    sortTripFiles(tripFiles, sortBy);
+
     res.render("tripFolders/folderPage/show", {
       tripFolder: tripFolder,
       usernames: usernames,
       user: user,
       errorMessage: errorMessage,
       tripFiles: tripFiles,
+      sortBy: sortBy || "",
+      filterUser: filterUser || "",
     });
   } catch (err) {
-    console.error(err);
     res.redirect("/");
   }
 });
@@ -426,6 +436,29 @@ function saveImage(tripFile, imgEncoded) {
   if (image != null && imageMimeTypes.includes(image.type)) {
     tripFile.image = new Buffer.from(image.data, "base64");
     tripFile.imageType = image.type;
+  }
+}
+
+function sortTripFiles(tripFiles, sortBy) {
+  if (!sortBy) return;
+  if (sortBy === "setDate") {
+    tripFiles.sort((a, b) => {
+      return new Date(b.userSetDate) - new Date(a.userSetDate);
+    });
+  }
+  if (sortBy === "uploadDate") {
+    tripFiles.sort((a, b) => {
+      return new Date(b.userSetDate) - new Date(a.userSetDate);
+    });
+  }
+  if (sortBy === "title") {
+    tripFiles.sort((a, b) => {
+      const titleA = a.title ? a.title.toLowerCase() : "zzzzz";
+      const titleB = b.title ? b.title.toLowerCase() : "zzzzz";
+      if (titleA < titleB) return -1;
+      if (titleA > titleB) return 1;
+      return 0;
+    });
   }
 }
 
