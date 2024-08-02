@@ -22,14 +22,18 @@ const tripFileSchema = mongoose.Schema({
   description: {
     type: String,
   },
-  imageType: {
+  // imageType: {
+  //   type: String,
+  //   required: true,
+  // },
+  imageURL: {
     type: String,
     required: true,
   },
-  image: {
-    type: Buffer,
-    required: true,
-  },
+  // image: {
+  //   type: Buffer,
+  //   required: true,
+  // },
 });
 
 tripFileSchema.virtual("imagePath").get(function () {

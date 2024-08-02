@@ -13,7 +13,7 @@ const {
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
-const { verify } = require("jsonwebtoken");
+const uploadS3 = require("../public/javascripts/multerSetup");
 
 const imageMimeTypes = [
   "image/jpeg",
@@ -266,32 +266,42 @@ router.get("/:tripID/addFile", verifyToken, async (req, res) => {
   }
 });
 
-router.post("/:tripID/addFile", verifyToken, async (req, res) => {
-  try {
-    const user = await retrieveUser(req, res);
-    const tripFolder = await TripFolder.findById(req.params.tripID);
-    const tripFile = new TripFile({
-      title: req.body.title,
-      description: req.body.description,
-      userSetDate: req.body.userSetDate,
-      uploadedBy: user.id,
-    });
+router.post(
+  "/:tripID/addFile",
+  verifyToken,
+  uploadS3.single("image"),
+  async (req, res) => {
+    try {
+      const user = await retrieveUser(req, res);
+      const tripFolder = await TripFolder.findById(req.params.tripID);
 
-    saveImage(tripFile, req.body.image);
+      if (!req.file) throw new CustomErr("No File Uploaded");
 
-    const newTripFile = await tripFile.save();
-    tripFolder.tripFiles.push(newTripFile.id);
-    await tripFolder.save();
+      const tripFile = new TripFile({
+        title: req.body.title,
+        description: req.body.description,
+        userSetDate: req.body.userSetDate,
+        uploadedBy: user.id,
+        imageURL: req.file.location,
+      });
 
-    res.redirect(`/tripFolders/${tripFolder.id}`);
-  } catch (err) {
-    res.render("tripFolders/folderPage/show", {
-      tripFolder: tripFolder,
-      errorMessage: "Cannot add file at this time",
-      user: user,
-    });
+      console.log(tripFile.imageURL);
+
+      const newTripFile = await tripFile.save();
+      tripFolder.tripFiles.push(newTripFile.id);
+      await tripFolder.save();
+
+      res.redirect(`/tripFolders/${tripFolder.id}`);
+    } catch (err) {
+      console.error(err);
+      res.render("tripFolders/folderPage/show", {
+        tripFolder: tripFolder,
+        errorMessage: "Cannot add file at this time",
+        user: user,
+      });
+    }
   }
-});
+);
 
 router.get("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
@@ -363,6 +373,8 @@ router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
     const tripFolder = await TripFolder.findById(tripID);
     const tripFile = await TripFile.findById(fileID);
     const uploadedBy = await User.findById(tripFile.uploadedBy);
+
+    console.log(tripFile);
 
     res.render("tripFiles/show", {
       tripFolder: tripFolder,
@@ -436,6 +448,7 @@ function saveImage(tripFile, imgEncoded) {
   if (image != null && imageMimeTypes.includes(image.type)) {
     tripFile.image = new Buffer.from(image.data, "base64");
     tripFile.imageType = image.type;
+    const imageSize = Buffer.byteLength(tripFile.image, "base64");
   }
 }
 

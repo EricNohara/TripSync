@@ -1,5 +1,9 @@
 <h2>Add File</h2>
-<form action="/tripFolders/{{tripFolder.id}}/addFile" method="POST">
+<form
+  action="/tripFolders/{{tripFolder.id}}/addFile"
+  enctype="multipart/form-data"
+  method="POST"
+>
   <label>Title</label>
   <input type="text" name="title" />
   <label>Date</label>
@@ -7,6 +11,6 @@
   <label>Description</label>
   <textarea name="description"></textarea>
   <label>Image</label>
-  <input type="file" name="image" class="filepond" required />
+  <input type="file" name="image" accept="image/*" required />
   <button type="submit">Add</button>
 </form>
