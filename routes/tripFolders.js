@@ -13,7 +13,7 @@ const {
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
-const uploadS3 = require("../public/javascripts/multerSetup");
+const { upload, uploadToS3 } = require("../public/javascripts/multerSetup");
 
 const imageMimeTypes = [
   "image/jpeg",
@@ -269,7 +269,8 @@ router.get("/:tripID/addFile", verifyToken, async (req, res) => {
 router.post(
   "/:tripID/addFile",
   verifyToken,
-  uploadS3.single("image"),
+  upload.single("image"),
+  uploadToS3,
   async (req, res) => {
     try {
       const user = await retrieveUser(req, res);
@@ -285,7 +286,7 @@ router.post(
         imageURL: req.file.location,
       });
 
-      console.log(tripFile.imageURL);
+      // console.log(tripFile.imageURL);
 
       const newTripFile = await tripFile.save();
       tripFolder.tripFiles.push(newTripFile.id);
@@ -373,8 +374,6 @@ router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
     const tripFolder = await TripFolder.findById(tripID);
     const tripFile = await TripFile.findById(fileID);
     const uploadedBy = await User.findById(tripFile.uploadedBy);
-
-    console.log(tripFile);
 
     res.render("tripFiles/show", {
       tripFolder: tripFolder,

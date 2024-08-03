@@ -9,6 +9,8 @@
   "author": "Eric Nohara-LeClair",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.623.0",
+    "@aws-sdk/lib-storage": "^3.623.0",
     "aws-sdk": "^2.1666.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -20,7 +22,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^8.5.1",
     "multer": "^1.4.5-lts.1",
-    "multer-s3": "^2.10.0"
+    "sharp": "^0.33.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

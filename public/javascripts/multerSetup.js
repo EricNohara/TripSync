@@ -1,8 +1,12 @@
 const multer = require("multer");
-const multerS3 = require("multer-s3");
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { Upload } = require("@aws-sdk/lib-storage");
+const sharp = require("sharp");
+const stream = require("stream");
+const { CustomErr } = require("./customErrors");
+const imageQuality = 10;
 
-AWS.config.update({
+const s3Client = new S3Client({
   region: process.env.AWS_REGION,
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -10,17 +14,39 @@ AWS.config.update({
   },
 });
 
-const s3 = new AWS.S3();
+const upload = multer({ storage: multer.memoryStorage() });
 
-const uploadS3 = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.S3_BUCKET_NAME,
-    key: function (req, file, cb) {
-      cb(null, Date.now().toString());
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE, // Automatically sets the correct content type
-  }),
-});
+async function uploadToS3(req, res, next) {
+  try {
+    if (!req.file) throw new CustomErr("No file uploaded");
 
-module.exports = uploadS3;
+    const processedImage = await sharp(req.file.buffer)
+      .webp({ quality: imageQuality })
+      .toBuffer();
+
+    const readableStream = new stream.PassThrough();
+    readableStream.end(processedImage);
+
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: `${Date.now()}.webp`,
+      Body: readableStream,
+      ContentType: "image/webp",
+    };
+
+    const parallelUploads3 = new Upload({
+      client: s3Client,
+      params: params,
+      leavePartsOnError: false,
+    });
+
+    await parallelUploads3.done();
+    const location = `https://${params.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`;
+    req.file.location = location;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { uploadToS3, upload };
