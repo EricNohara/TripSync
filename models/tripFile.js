@@ -26,6 +26,10 @@ const tripFileSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  imageHash: {
+    type: String,
+    required: true,
+  },
 });
 
 tripFileSchema.virtual("imagePath").get(function () {

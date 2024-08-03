@@ -1,19 +1,28 @@
 const express = require("express");
+const sharp = require("sharp");
 const router = express.Router();
 const TripFolder = require("../models/tripFolder");
 const TripFile = require("../models/tripFile");
 const User = require("../models/user");
+
 const {
   verifyToken,
   retrieveUser,
   getSearchableUsers,
 } = require("../public/javascripts/userOperations");
+
 const {
   CustomErr,
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
-const { upload, uploadToS3 } = require("../public/javascripts/multerSetup");
+
+const {
+  upload,
+  uploadToS3,
+  deleteFromS3,
+  calculateSHA256,
+} = require("../public/javascripts/multerSetup");
 
 const imageMimeTypes = [
   "image/jpeg",
@@ -284,13 +293,13 @@ router.post(
         userSetDate: req.body.userSetDate,
         uploadedBy: user.id,
         imageURL: req.file.location,
+        imageHash: req.file.hash,
       });
-
-      // console.log(tripFile.imageURL);
 
       const newTripFile = await tripFile.save();
       tripFolder.tripFiles.push(newTripFile.id);
       await tripFolder.save();
+      console.log(newTripFile);
 
       res.redirect(`/tripFolders/${tripFolder.id}`);
     } catch (err) {
@@ -323,28 +332,42 @@ router.get("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
-  const { tripID, fileID } = req.params;
-  try {
-    const user = await retrieveUser(req, res);
-    const tripFolder = await TripFolder.findById(tripID);
-    const tripFile = await TripFile.findById(fileID);
-    await verifyUserTripFile(tripFile, user);
+router.put(
+  "/:tripID/:fileID/editFile",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    const { tripID, fileID } = req.params;
+    try {
+      const user = await retrieveUser(req, res);
+      const tripFolder = await TripFolder.findById(tripID);
+      const tripFile = await TripFile.findById(fileID);
+      await verifyUserTripFile(tripFile, user);
 
-    tripFile.title = req.body.title === "" ? null : req.body.title;
-    tripFile.description =
-      req.body.description === "" ? null : req.body.description;
-    if (req.body.image) saveImage(tripFile, req.body.image);
-    tripFile.userSetDate = req.body.userSetDate;
-    await tripFile.save();
-    res.redirect(`/tripFolders/${tripFolder.id}/${tripFile.id}`);
-  } catch (err) {
-    err = setWildcardError(err, "Error Editing Trip File");
-    res.redirect(
-      queryAppendError(`/tripFolders/${tripID}/${fileID}/editFile`, err)
-    );
+      tripFile.title = req.body.title === "" ? null : req.body.title;
+      tripFile.description =
+        req.body.description === "" ? null : req.body.description;
+      if (req.file) {
+        const processedNewImage = await sharp(req.file.buffer)
+          .webp({ quality: 10 })
+          .withMetadata({})
+          .toBuffer();
+        const newImageHash = calculateSHA256(processedNewImage);
+        console.log(newImageHash + "\n" + tripFile.imageHash);
+        // if (newImageHash !== tripFile.imageHash) console.log("Editing image now");
+      }
+      tripFile.userSetDate = req.body.userSetDate;
+      await tripFile.save();
+      res.redirect(`/tripFolders/${tripFolder.id}/${tripFile.id}`);
+    } catch (err) {
+      console.error(err);
+      err = setWildcardError(err, "Error Editing Trip File");
+      res.redirect(
+        queryAppendError(`/tripFolders/${tripID}/${fileID}/editFile`, err)
+      );
+    }
   }
-});
+);
 
 router.delete("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
   const { tripID, fileID } = req.params;
@@ -357,6 +380,7 @@ router.delete("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
     if (index > -1) tripFolder.tripFiles.splice(index, 1);
     else throw new CustomErr("Error removing file from trip folder");
     await tripFolder.save();
+    await deleteFromS3(tripFile.imageURL);
     await tripFile.deleteOne();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
@@ -438,16 +462,6 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
     });
   } catch {
     res.redirect("/");
-  }
-}
-
-function saveImage(tripFile, imgEncoded) {
-  if (imgEncoded == null) return;
-  const image = JSON.parse(imgEncoded);
-  if (image != null && imageMimeTypes.includes(image.type)) {
-    tripFile.image = new Buffer.from(image.data, "base64");
-    tripFile.imageType = image.type;
-    const imageSize = Buffer.byteLength(tripFile.image, "base64");
   }
 }
 
