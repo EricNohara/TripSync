@@ -21,7 +21,7 @@ function calculateSHA256(data) {
   return crypto.createHash("sha256").update(data).digest("hex");
 }
 
-async function uploadToS3(req, res, next) {
+async function uploadToS3(req, res) {
   try {
     if (!req.file) throw new CustomErr("No file uploaded");
 
@@ -52,6 +52,15 @@ async function uploadToS3(req, res, next) {
     const location = `https://${params.Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`;
     req.file.location = location;
     req.file.hash = newImageHash;
+  } catch (err) {
+    if (err instanceof CustomErr) throw err;
+    else throw new CustomErr(err);
+  }
+}
+
+async function uploadToS3Middleware(req, res, next) {
+  try {
+    uploadToS3(req, res);
     next();
   } catch (err) {
     next(err);
@@ -74,4 +83,10 @@ async function deleteFromS3(imageURL) {
   }
 }
 
-module.exports = { uploadToS3, upload, deleteFromS3, calculateSHA256 };
+module.exports = {
+  uploadToS3,
+  uploadToS3Middleware,
+  upload,
+  deleteFromS3,
+  calculateSHA256,
+};

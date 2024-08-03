@@ -20,6 +20,7 @@ const {
 const {
   upload,
   uploadToS3,
+  uploadToS3Middleware,
   deleteFromS3,
   calculateSHA256,
 } = require("../public/javascripts/multerSetup");
@@ -279,7 +280,7 @@ router.post(
   "/:tripID/addFile",
   verifyToken,
   upload.single("image"),
-  uploadToS3,
+  uploadToS3Middleware,
   async (req, res) => {
     try {
       const user = await retrieveUser(req, res);
@@ -347,20 +348,24 @@ router.put(
       tripFile.title = req.body.title === "" ? null : req.body.title;
       tripFile.description =
         req.body.description === "" ? null : req.body.description;
+      // update file if needed
       if (req.file) {
         const processedNewImage = await sharp(req.file.buffer)
           .webp({ quality: 10 })
           .withMetadata({})
           .toBuffer();
         const newImageHash = calculateSHA256(processedNewImage);
-        console.log(newImageHash + "\n" + tripFile.imageHash);
-        // if (newImageHash !== tripFile.imageHash) console.log("Editing image now");
+        if (newImageHash !== tripFile.imageHash) {
+          await deleteFromS3(tripFile.imageURL);
+          await uploadToS3(req, res);
+          tripFile.imageURL = req.file.location;
+          tripFile.imageHash = req.file.hash;
+        }
       }
       tripFile.userSetDate = req.body.userSetDate;
       await tripFile.save();
       res.redirect(`/tripFolders/${tripFolder.id}/${tripFile.id}`);
     } catch (err) {
-      console.error(err);
       err = setWildcardError(err, "Error Editing Trip File");
       res.redirect(
         queryAppendError(`/tripFolders/${tripID}/${fileID}/editFile`, err)
