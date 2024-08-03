@@ -60,7 +60,7 @@ async function uploadToS3(req, res) {
 
 async function uploadToS3Middleware(req, res, next) {
   try {
-    uploadToS3(req, res);
+    await uploadToS3(req, res);
     next();
   } catch (err) {
     next(err);

@@ -154,7 +154,6 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
       errorMessage: errorMessage,
     });
   } catch (err) {
-    console.error(err);
     res.redirect(`/tripFolders/${req.params.tripID}`);
   }
 });
@@ -246,8 +245,14 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
   try {
     user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
+    // delete all files in folder
+    for (const tripFileID of tripFolder.tripFiles) {
+      const tripFile = await TripFile.findById(tripFileID);
+      await deleteFromS3(tripFile.imageURL);
+      await tripFile.deleteOne();
+    }
+
     await tripFolder.deleteOne();
-    tripFolder.tripFiles;
     res.redirect("/tripFolders");
   } catch (err) {
     res.render("tripFolders/folderPage/show", {
@@ -300,11 +305,8 @@ router.post(
       const newTripFile = await tripFile.save();
       tripFolder.tripFiles.push(newTripFile.id);
       await tripFolder.save();
-      console.log(newTripFile);
-
       res.redirect(`/tripFolders/${tripFolder.id}`);
     } catch (err) {
-      console.error(err);
       res.render("tripFolders/folderPage/show", {
         tripFolder: tripFolder,
         errorMessage: "Cannot add file at this time",
@@ -449,7 +451,7 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
   if (folderType === "private") searchOptions.isShared = false;
   else searchOptions.isShared = true;
 
-  if (user.isPrivate === true) {
+  if (user.isPrivate === true && folderType === "shared") {
     return res.render(`tripFolders/${folderType}`, {
       user: user,
       searchOptions: req.query,
