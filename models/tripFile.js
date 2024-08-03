@@ -32,12 +32,4 @@ const tripFileSchema = mongoose.Schema({
   },
 });
 
-tripFileSchema.virtual("imagePath").get(function () {
-  if (this.image != null && this.imageType != null) {
-    return `data:${this.imageType};charset=utf-8;base64,${this.image.toString(
-      "base64"
-    )}`;
-  }
-});
-
 module.exports = mongoose.model("TripFile", tripFileSchema);
