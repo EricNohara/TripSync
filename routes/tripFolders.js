@@ -25,16 +25,6 @@ const {
   calculateSHA256,
 } = require("../public/javascripts/multerSetup");
 
-const imageMimeTypes = [
-  "image/jpeg",
-  "image/png",
-  "image/gif",
-  "image/bmp",
-  "image/webp",
-  "image/tiff",
-  "image/svg+xml",
-];
-
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
   try {
@@ -83,6 +73,8 @@ router.post("/create", verifyToken, async (req, res) => {
       users: [user.id],
     });
     const newTripFolder = await tripFolder.save();
+    user.privateFolders.push(newTripFolder.id);
+    await user.save();
     res.redirect(`/tripFolders/${newTripFolder.id}`);
   } catch {
     res.redirect(
@@ -160,10 +152,9 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
 
 // Route to Edit add User to Trip Folder
 router.put("/:tripID/addUser", verifyToken, async (req, res) => {
-  let user = null;
   try {
     const tripFolder = await TripFolder.findById(req.params.tripID);
-    user = await retrieveUser(req, res);
+    const user = await retrieveUser(req, res);
     if (user.isPrivate)
       throw new CustomErr("User must be a shared account to add other users");
     if (!req.body.addUsername || req.body.addUsername === "")
@@ -179,7 +170,14 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
 
     tripFolder.users.push(addedUser.id);
     tripFolder.isShared = true;
+    const indexOfFolder = user.privateFolders.indexOf(tripFolder.id);
+    if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1); // remove folder from private folders
+    user.sharedFolders.push(tripFolder.id);
+    addedUser.sharedFolders.push(tripFolder.id);
+
     await tripFolder.save();
+    await user.save();
+    await addedUser.save();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
     err = setWildcardError(err, "Error adding selected user");
@@ -195,12 +193,27 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripId);
     const index = tripFolder.users.indexOf(user.id);
+    const indexOfFolder = user.sharedFolders.indexOf(tripFolder.id);
+
     if (index > -1) tripFolder.users.splice(index, 1);
     else throw new CustomErr("Error removing user from trip folder");
-    if (tripFolder.users.length === 1) tripFolder.isShared = false;
+    if (indexOfFolder > -1) user.sharedFolders.splice(indexOfFolder, 1);
+    else throw new CustomErr("Error removing folder from user data");
+    if (tripFolder.users.length === 1) {
+      tripFolder.isShared = false;
+      const remainingUser = await User.findById(tripFolder.users[0]);
+      const indexOfFolder = remainingUser.sharedFolders.indexOf(tripFolder.id);
+      if (indexOfFolder > -1) remainingUser.sharedFolders.splice(indexOfFolder);
+      else throw new CustomErr("Error updating remaining user info");
+      remainingUser.privateFolders.push(tripFolder.id);
+      await remainingUser.save();
+    }
+
     await tripFolder.save();
+    await user.save();
     res.redirect("/tripFolders");
   } catch (err) {
+    console.error(err);
     err = setWildcardError(err, "Error removing user from trip folder");
     res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
   }
@@ -252,7 +265,18 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
       await tripFile.deleteOne();
     }
 
+    if (tripFolder.isShared) {
+      const indexOfFolder = user.sharedFolders.indexOf(tripFolder.id);
+      if (indexOfFolder > -1) user.sharedFolders.splice(indexOfFolder, 1);
+      else throw new CustomErr("Error removing folder from user info");
+    } else {
+      const indexOfFolder = user.privateFolders.indexOf(tripFolder.id);
+      if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1);
+      else throw new CustomErr("Error removing folder from user info");
+    }
+
     await tripFolder.deleteOne();
+    await user.save();
     res.redirect("/tripFolders");
   } catch (err) {
     res.render("tripFolders/folderPage/show", {
@@ -448,8 +472,13 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
   if (user) searchOptions.users = user.id;
   else res.redirect("/");
 
-  if (folderType === "private") searchOptions.isShared = false;
-  else searchOptions.isShared = true;
+  if (folderType === "private") {
+    searchOptions.isShared = false;
+    folderIDs = user.privateFolders;
+  } else {
+    searchOptions.isShared = true;
+    folderIDs = user.sharedFolders;
+  }
 
   if (user.isPrivate === true && folderType === "shared") {
     return res.render(`tripFolders/${folderType}`, {
@@ -461,7 +490,10 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
   }
 
   try {
-    const tripFolders = await TripFolder.find(searchOptions);
+    const tripFolders = await TripFolder.find({
+      _id: { $in: folderIDs },
+      ...searchOptions,
+    });
     res.render(`tripFolders/${folderType}`, {
       tripFolders: tripFolders,
       user: user,

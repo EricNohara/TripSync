@@ -18,6 +18,16 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
+  privateFolders: {
+    type: Array,
+    required: true,
+    default: [],
+  },
+  sharedFolders: {
+    type: Array,
+    required: true,
+    default: [],
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
