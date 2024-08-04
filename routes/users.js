@@ -190,9 +190,10 @@ router.delete("/delete", verifyToken, async (req, res) => {
     if (req.body.email !== user.email) throw new CustomErr("Email Incorrect");
     if (!passwordMatch) throw new CustomErr("Password Incorrect");
 
-    const userFolders = await TripFolder.find({ users: user.id });
     // Delete user from all folders and remove all files user uploaded to those folders
+    const userFolders = await TripFolder.find({ users: user.id });
     for (const folder of userFolders) {
+      const notification = `${user.username} left shared folder: ${folder.folderName}`;
       const userFilesInFolder = await TripFile.find({
         _id: { $in: folder.tripFiles },
         uploadedBy: user.id,
@@ -200,18 +201,46 @@ router.delete("/delete", verifyToken, async (req, res) => {
 
       for (const file of userFilesInFolder) {
         const index = folder.tripFiles.indexOf(file.id);
-        if (index > -1) {
-          folder.tripFiles.splice(index, 1);
-          await folder.save();
-        }
+        if (index > -1) folder.tripFiles.splice(index, 1);
         await file.deleteOne();
       }
 
       const index = folder.users.indexOf(user.id);
-      if (index > -1) {
-        folder.users.splice(index, 1);
-        await folder.save();
+      if (index > -1) folder.users.splice(index, 1);
+
+      // send notification to remaining user
+      for (const remainingUserID of folder.users) {
+        const remainingUser = await User.findById(remainingUserID);
+        remainingUser.notifications.push(notification);
+        await remainingUser.save();
       }
+
+      // Delete all pending requests made by user
+      for (const outgoingRequest of user.outgoingRequests) {
+        const requestedUser = await User.findById(outgoingRequest.user);
+        const tripFolder = await TripFolder.findById(
+          outgoingRequest.tripFolder
+        );
+        const indexOfRequest = requestedUser.incomingRequests.findIndex(
+          (incomingRequest) =>
+            incomingRequest.user.equals(user.id) &&
+            incomingRequest.tripFolder.equals(tripFolder.id)
+        );
+        if (indexOfRequest > -1)
+          requestedUser.incomingRequests.splice(indexOfRequest, 1);
+
+        const indexOfNotification = requestedUser.notifications.findIndex(
+          (notif) =>
+            notif ===
+            `${user.username} has invited you to join a folder named: ${tripFolder.folderName}`
+        );
+        if (indexOfNotification > -1)
+          requestedUser.notifications.splice(indexOfNotification, 1);
+
+        await requestedUser.save();
+      }
+
+      await folder.save();
     }
 
     await user.deleteOne();
