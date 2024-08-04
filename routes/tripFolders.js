@@ -150,7 +150,7 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
   }
 });
 
-// Route to Edit add User to Trip Folder
+// Route to add User to Trip Folder by creating new request
 router.put("/:tripID/addUser", verifyToken, async (req, res) => {
   try {
     const tripFolder = await TripFolder.findById(req.params.tripID);
@@ -159,25 +159,46 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
       throw new CustomErr("User must be a shared account to add other users");
     if (!req.body.addUsername || req.body.addUsername === "")
       throw new CustomErr("Error adding selected user");
-    const addedUser = await User.findOne({ username: req.body.addUsername });
-    if (tripFolder.users.indexOf(addedUser.id) > -1)
+    const requestedUser = await User.findOne({
+      username: req.body.addUsername,
+    });
+    if (tripFolder.users.indexOf(requestedUser.id) > -1)
       throw new CustomErr("Selected user already added to the current folder");
-    if (!addedUser) throw new CustomErr("Error adding selected user");
-    if (addedUser.isPrivate)
+    if (!requestedUser) throw new CustomErr("Error adding selected user");
+    if (requestedUser.isPrivate)
       throw new CustomErr("Selected user is private account");
-    if (addedUser.username === user.username)
+    if (requestedUser.username === user.username)
       throw new CustomErr("Error: Cannot add self to folder");
 
-    tripFolder.users.push(addedUser.id);
-    tripFolder.isShared = true;
-    const indexOfFolder = user.privateFolders.indexOf(tripFolder.id);
-    if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1); // remove folder from private folders
-    user.sharedFolders.push(tripFolder.id);
-    addedUser.sharedFolders.push(tripFolder.id);
+    // tripFolder.users.push(requestedUser.id);
+    // tripFolder.isShared = true;
+    // const indexOfFolder = user.privateFolders.indexOf(tripFolder.id);
+    // if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1); // remove folder from private folders
+    // user.sharedFolders.push(tripFolder.id);
+    // requestedUser.sharedFolders.push(tripFolder.id);
+
+    const request = { user: user.id, tripFolder: tripFolder.id };
+    const notification = `${user.username} has invited you to join a folder named: ${tripFolder.folderName}`;
+    const requestExists = requestedUser.incomingRequests.some(
+      (incomingRequest) =>
+        incomingRequest.user.equals(request.user) &&
+        incomingRequest.tripFolder.equals(request.tripFolder)
+    );
+
+    if (requestExists) {
+      throw new CustomErr("Selected user has already been requested");
+    } else {
+      requestedUser.incomingRequests.push(request);
+      requestedUser.notifications.push(notification);
+      user.outgoingRequests.push({
+        user: requestedUser.id,
+        tripFolder: tripFolder.id,
+      });
+    }
 
     await tripFolder.save();
     await user.save();
-    await addedUser.save();
+    await requestedUser.save();
     res.redirect(`/tripFolders/${tripFolder.id}`);
   } catch (err) {
     err = setWildcardError(err, "Error adding selected user");
@@ -213,7 +234,6 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     await user.save();
     res.redirect("/tripFolders");
   } catch (err) {
-    console.error(err);
     err = setWildcardError(err, "Error removing user from trip folder");
     res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
   }

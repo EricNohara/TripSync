@@ -1,0 +1,47 @@
+<div>
+  <h3>Incoming Requests</h3>
+  {{#each incomingRequests}}
+    {{this.user.username}}
+    invites you to join
+    {{this.tripFolder.folderName}}
+    <form
+      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/acceptIncomingRequest?_method=PUT"
+      method="POST"
+    >
+      <button type="submit">Accept</button>
+    </form>
+    <form
+      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/declineIncomingRequest?_method=PUT"
+      method="POST"
+    >
+      <button type="submit">Decline</button>
+    </form>
+  {{/each}}
+</div>
+<div>
+  <h3>Outgoing Requests</h3>
+  {{#each outgoingRequest}}
+    Requested
+    {{this.user.username}}
+    to join
+    {{this.tripFolder.folderName}}
+    <form
+      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/cancelOutgoingRequest?_method=PUT"
+      method="POST"
+    >
+      <button type="submit">Cancel</button>
+    </form>
+  {{/each}}
+</div>
+<div>
+  <h3>Notifications</h3>
+  {{#each user.notifications}}
+    {{this}}
+    <form
+      action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"
+      method="POST"
+    >
+      <button type="submit">Delete</button>
+    </form>
+  {{/each}}
+</div>

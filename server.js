@@ -69,11 +69,13 @@ app.use(bodyParser.urlencoded({ limit: "10mb", extended: false }));
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const tripFoldersRouter = require("./routes/tripFolders");
+const activityCenterRouter = require("./routes/activityCenter");
 // const tempDevRouter = require("./routes/tempDev");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/tripFolders", tripFoldersRouter);
+app.use("/activityCenter", activityCenterRouter);
 // app.use("/tempDev", tempDevRouter);
 
 app.listen(app.get("port"), () => {

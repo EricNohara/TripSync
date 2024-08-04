@@ -35,10 +35,10 @@
       <label>Account Type</label>
       {{#if user}}
         <input type="radio" name="isPrivate" value="true" {{#if user.isPrivate}}checked{{/if}} />Private
-        <input type="radio" name="isPrivate" value="false" {{#unless user.isPrivate}}checked{{/unless}} />Shared
+        <input type="radio" name="isPrivate" value="false" {{#unless user.isPrivate}}checked{{/unless}} />Public
       {{else}}
         <input type="radio" name="isPrivate" value="true" />Private
-        <input type="radio" name="isPrivate" value="false" checked />Shared
+        <input type="radio" name="isPrivate" value="false" checked />Public
       {{/if}}
     </div>
   {{/if}}
