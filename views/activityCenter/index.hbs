@@ -1,3 +1,4 @@
+{{> errorMessage}}
 <div>
   <h3>Incoming Requests</h3>
   {{#each incomingRequests}}
@@ -20,7 +21,7 @@
 </div>
 <div>
   <h3>Outgoing Requests</h3>
-  {{#each outgoingRequest}}
+  {{#each outgoingRequests}}
     Requested
     {{this.user.username}}
     to join

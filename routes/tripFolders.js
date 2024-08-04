@@ -177,23 +177,21 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     // user.sharedFolders.push(tripFolder.id);
     // requestedUser.sharedFolders.push(tripFolder.id);
 
-    const request = { user: user.id, tripFolder: tripFolder.id };
+    const inRequest = { user: user.id, tripFolder: tripFolder.id };
+    const outRequest = { user: requestedUser.id, tripFolder: tripFolder.id };
     const notification = `${user.username} has invited you to join a folder named: ${tripFolder.folderName}`;
     const requestExists = requestedUser.incomingRequests.some(
       (incomingRequest) =>
-        incomingRequest.user.equals(request.user) &&
-        incomingRequest.tripFolder.equals(request.tripFolder)
+        incomingRequest.user.equals(inRequest.user) &&
+        incomingRequest.tripFolder.equals(inRequest.tripFolder)
     );
 
     if (requestExists) {
       throw new CustomErr("Selected user has already been requested");
     } else {
-      requestedUser.incomingRequests.push(request);
+      requestedUser.incomingRequests.push(inRequest);
       requestedUser.notifications.push(notification);
-      user.outgoingRequests.push({
-        user: requestedUser.id,
-        tripFolder: tripFolder.id,
-      });
+      user.outgoingRequests.push(outRequest);
     }
 
     await tripFolder.save();
