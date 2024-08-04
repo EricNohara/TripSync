@@ -228,6 +228,14 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
       await remainingUser.save();
     }
 
+    // Send notifications to remaining users in folder
+    for (const folderUserID of tripFolder.users) {
+      const folderUser = await User.findById(folderUserID);
+      const notification = `${user.username} left shared folder: ${tripFolder.folderName}`;
+      folderUser.notifications.push(notification);
+      await folderUser.save();
+    }
+
     await tripFolder.save();
     await user.save();
     res.redirect("/tripFolders");
