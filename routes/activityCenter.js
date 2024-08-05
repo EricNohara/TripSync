@@ -43,10 +43,36 @@ router.get("/", verifyToken, async (req, res) => {
       })
     );
 
+    const formattedNotifications = await Promise.all(
+      user.notifications.map(async (notif) => {
+        try {
+          const notifUser = await User.findById(notif.user);
+          const notifTripFolder = await TripFolder.findById(notif.tripFolder);
+          const notifType = notif.notifType;
+
+          switch (notifType) {
+            case "incomingRequest":
+              return `${notifUser.username} has invited you to join a folder named: ${notifTripFolder.folderName}`;
+            case "removeUser":
+              return `${notifUser.username} left shared folder: ${notifTripFolder.folderName}`;
+            case "acceptIncomingRequest":
+              return `${notifUser.username} has joined ${notifTripFolder.folderName}`;
+            case "declineIncomingRequest":
+              return `${notifUser.username} declined to join ${notifTripFolder.folderName}`;
+            default:
+              throw new CustomErr("Error: invalid notification type detected");
+          }
+        } catch {
+          return null;
+        }
+      })
+    );
+
     res.render("activityCenter/index", {
       user: user,
       incomingRequests: incomingRequests,
       outgoingRequests: outgoingRequests,
+      formattedNotifications: formattedNotifications,
       errorMessage: errorMessage,
     });
   } catch (err) {
@@ -94,7 +120,11 @@ router.put(
       removeRequestsAndNotifications(user, sentByUser, tripFolder);
 
       // Send notification to sent by user
-      const responseNotification = `${user.username} has joined ${tripFolder.folderName}`;
+      const responseNotification = {
+        user: user.id,
+        tripFolder: tripFolder.id,
+        notifType: "acceptIncomingRequest",
+      };
       sentByUser.notifications.push(responseNotification);
 
       await user.save();
@@ -120,7 +150,11 @@ router.put(
 
       // Remove requests and send notification to sent by user
       removeRequestsAndNotifications(user, sentByUser, tripFolder);
-      const responseNotification = `${user.username} declined to join ${tripFolder.folderName}`;
+      const responseNotification = {
+        user: user.id,
+        tripFolder: tripFolder.id,
+        notifType: "declineIncomingRequest",
+      };
       sentByUser.notifications.push(responseNotification);
 
       await user.save();
@@ -158,7 +192,7 @@ router.put(
   }
 );
 
-function removeRequestsAndNotifications(user, sentByUser, tripFolder) {
+async function removeRequestsAndNotifications(user, sentByUser, tripFolder) {
   const inRequestIndex = user.incomingRequests.findIndex(
     (incomingRequest) =>
       incomingRequest.user.equals(sentByUser.id) &&
@@ -180,8 +214,9 @@ function removeRequestsAndNotifications(user, sentByUser, tripFolder) {
 
   const notificationIndex = user.notifications.findIndex(
     (notification) =>
-      notification ===
-      `${sentByUser.username} has invited you to join a folder named: ${tripFolder.folderName}`
+      notification.user.equals(sentByUser.id) &&
+      notification.tripFolder.equals(tripFolder.id) &&
+      notification.notifType === "incomingRequest"
   );
 
   if (notificationIndex > -1) user.notifications.splice(notificationIndex, 1);

@@ -170,16 +170,13 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     if (requestedUser.username === user.username)
       throw new CustomErr("Error: Cannot add self to folder");
 
-    // tripFolder.users.push(requestedUser.id);
-    // tripFolder.isShared = true;
-    // const indexOfFolder = user.privateFolders.indexOf(tripFolder.id);
-    // if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1); // remove folder from private folders
-    // user.sharedFolders.push(tripFolder.id);
-    // requestedUser.sharedFolders.push(tripFolder.id);
-
     const inRequest = { user: user.id, tripFolder: tripFolder.id };
     const outRequest = { user: requestedUser.id, tripFolder: tripFolder.id };
-    const notification = `${user.username} has invited you to join a folder named: ${tripFolder.folderName}`;
+    const notification = {
+      user: user.id,
+      tripFolder: tripFolder.id,
+      notifType: "incomingRequest",
+    };
     const requestExists = requestedUser.incomingRequests.some(
       (incomingRequest) =>
         incomingRequest.user.equals(inRequest.user) &&
@@ -231,7 +228,12 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     // Send notifications to remaining users in folder
     for (const folderUserID of tripFolder.users) {
       const folderUser = await User.findById(folderUserID);
-      const notification = `${user.username} left shared folder: ${tripFolder.folderName}`;
+      const notification = {
+        user: user.id,
+        tripFolder: tripFolder.id,
+        notifType: "removeUser",
+      };
+
       folderUser.notifications.push(notification);
       await folderUser.save();
     }

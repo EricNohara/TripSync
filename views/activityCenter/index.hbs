@@ -36,7 +36,7 @@
 </div>
 <div>
   <h3>Notifications</h3>
-  {{#each user.notifications}}
+  {{#each formattedNotifications}}
     {{this}}
     <form
       action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"

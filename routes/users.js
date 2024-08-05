@@ -150,10 +150,14 @@ router.put("/edit", verifyToken, async (req, res) => {
       throw new CustomErr("Password incorrect: Cannot edit user information");
 
     const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
-    user.username = req.body.username;
     user.email = req.body.email;
+    user.username = req.body.username;
     user.password = hashedPassword;
     user.isPrivate = req.body.isPrivate === "false" ? false : true;
+
+    // Note: need to change notification implementation to be generated on the fly: {user, tripFolder, notifType}
+    // this allows for edits to username to be reflected
+
     await user.save();
     res.redirect("/");
   } catch (err) {

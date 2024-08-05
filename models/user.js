@@ -59,7 +59,20 @@ const userSchema = new mongoose.Schema({
   },
   notifications: {
     // used to display important info: (new request, accepted request, rejected request)
-    type: [String],
+    type: [
+      {
+        user: { type: mongoose.Schema.ObjectId, ref: "User", required: true },
+        tripFolder: {
+          type: mongoose.Schema.ObjectId,
+          ref: "TripFolder",
+          required: true,
+        },
+        notifType: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
     required: true,
     default: [],
   },
