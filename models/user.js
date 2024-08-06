@@ -76,6 +76,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: [],
   },
+  newNotificationCount: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);

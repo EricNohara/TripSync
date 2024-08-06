@@ -135,6 +135,9 @@ router.get("/:tripID", verifyToken, async (req, res) => {
 // Add User to Folder Route
 router.get("/:tripID/addUser", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  const successMessage = req.query.successMessage
+    ? req.query.successMessage
+    : null;
   try {
     const user = await retrieveUser(req, res);
     const users = await getSearchableUsers(req);
@@ -144,6 +147,7 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
       tripFolder: tripFolder,
       users: users,
       errorMessage: errorMessage,
+      successMessage: successMessage,
     });
   } catch (err) {
     res.redirect(`/tripFolders/${req.params.tripID}`);
@@ -188,13 +192,17 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     } else {
       requestedUser.incomingRequests.push(inRequest);
       requestedUser.notifications.push(notification);
+      requestedUser.newNotificationCount += 1;
       user.outgoingRequests.push(outRequest);
     }
 
     await tripFolder.save();
     await user.save();
     await requestedUser.save();
-    res.redirect(`/tripFolders/${tripFolder.id}`);
+    const successMessage = `Successfully invited ${requestedUser.username} to join ${tripFolder.folderName}`;
+    res.redirect(
+      `/tripFolders/${tripFolder.id}/addUser?successMessage=${successMessage}`
+    );
   } catch (err) {
     err = setWildcardError(err, "Error adding selected user");
     res.redirect(
@@ -235,6 +243,7 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
       };
 
       folderUser.notifications.push(notification);
+      folderUser.newNotificationCount += 1;
       await folderUser.save();
     }
 

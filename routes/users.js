@@ -155,9 +155,6 @@ router.put("/edit", verifyToken, async (req, res) => {
     user.password = hashedPassword;
     user.isPrivate = req.body.isPrivate === "false" ? false : true;
 
-    // Note: need to change notification implementation to be generated on the fly: {user, tripFolder, notifType}
-    // this allows for edits to username to be reflected
-
     await user.save();
     res.redirect("/");
   } catch (err) {
@@ -216,6 +213,7 @@ router.delete("/delete", verifyToken, async (req, res) => {
       for (const remainingUserID of folder.users) {
         const remainingUser = await User.findById(remainingUserID);
         remainingUser.notifications.push(notification);
+        remainingUser.newNotificationCount += 1;
         await remainingUser.save();
       }
 

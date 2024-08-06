@@ -68,11 +68,15 @@ router.get("/", verifyToken, async (req, res) => {
       })
     );
 
+    // Reset new notification count
+    user.newNotificationCount = 0;
+    await user.save();
+
     res.render("activityCenter/index", {
       user: user,
       incomingRequests: incomingRequests,
       outgoingRequests: outgoingRequests,
-      formattedNotifications: formattedNotifications,
+      formattedNotifications: formattedNotifications.reverse(),
       errorMessage: errorMessage,
     });
   } catch (err) {
@@ -85,8 +89,9 @@ router.get("/", verifyToken, async (req, res) => {
 router.put("/deleteNotification", verifyToken, async (req, res) => {
   try {
     const user = await retrieveUser(req, res);
-    const index = parseInt(req.query.index);
-    if (index > -1) {
+    const revIndex = parseInt(req.query.index);
+    if (revIndex > -1) {
+      const index = user.notifications.length - revIndex - 1;
       user.notifications.splice(index, 1);
       await user.save();
     } else throw new CustomErr("Invalid notification index");
@@ -126,6 +131,7 @@ router.put(
         notifType: "acceptIncomingRequest",
       };
       sentByUser.notifications.push(responseNotification);
+      sentByUser.newNotificationCount += 1;
 
       await user.save();
       await tripFolder.save();
@@ -156,6 +162,7 @@ router.put(
         notifType: "declineIncomingRequest",
       };
       sentByUser.notifications.push(responseNotification);
+      sentByUser.newNotificationCount += 1;
 
       await user.save();
       await tripFolder.save();

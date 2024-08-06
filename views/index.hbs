@@ -1,6 +1,15 @@
 {{> errorMessage}}
 {{#if user}}
-  <p>Welcome {{user.username}}! This accout is Private: {{user.isPrivate}}.</p>
+  <h2>Welcome {{user.username}}!</h2>
+  {{#if (userHasGtxNotifs user.newNotificationCount 1)}}
+    <h3>You have {{user.newNotificationCount}} new notifications!</h3>
+    <a href="/activityCenter">View Now</a>
+  {{else}}
+    {{#if (userHasGtxNotifs user.newNotificationCount 0)}}
+      <h3>You have {{user.newNotificationCount}} new notification!</h3>
+      <a href="/activityCenter">View Now</a>
+    {{/if}}
+  {{/if}}
 {{else}}
   <a href="/users/login">Log In</a>
 {{/if}}

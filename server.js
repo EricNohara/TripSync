@@ -37,6 +37,9 @@ const hbs = require("express-handlebars").create({
     equals: (a, b) => {
       return a === b;
     },
+    userHasGtxNotifs: (count, x) => {
+      return count > x;
+    },
   },
 });
 
