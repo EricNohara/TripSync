@@ -1,0 +1,14 @@
+@import "shared/fonts.css";
+@import "shared/variables.css";
+
+:root {
+  font-family: var(--app-font-family);
+  font-size: 1.2rem;
+  color: var(--app-text-color);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
