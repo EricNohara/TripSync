@@ -7,13 +7,18 @@ function verifyToken(req, res, next) {
   const token =
     req.cookies?.token || req.headers["authorization"]?.split(" ")[1];
 
+  const errorLink =
+    req.originalUrl === "/"
+      ? `/authError?errorMessage=`
+      : `/authError?errorMessage=${errorContent}`;
+
   if (!token) {
-    return res.redirect(`/authError?errorMessage=${errorContent}`);
+    return res.redirect(errorLink);
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.redirect(`/authError?errorMessage=${errorContent}`);
+      return res.redirect(errorLink);
     } else {
       req.user = decoded;
       next();
