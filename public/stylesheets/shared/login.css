@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--app-secondary-background-color);
+  width: 65%;
+  margin: auto;
+  border-radius: 2rem;
+}
+
+.login-container {
+  display: grid;
+  width: 400px;
+}
+
+.login-title {
+  font-weight: 500;
+  justify-self: center;
+  align-self: center;
+}
+
+.sign-up-link {
+  text-decoration: none;
+  color: var(--nav-select-text-color);
+  margin-left: 0.5rem;
+}
+
+.sign-up-message {
+  font-size: 0.9rem;
+  justify-self: center;
+  color: var(--app-secondary-text-color);
+  margin-bottom: 1.75rem;
+}
+
+input[type="text"],
+input[type="password"] {
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: inherit;
+  border: 2px solid var(--app-text-color);
+  border-radius: 1rem;
+  color: var(--app-text-color);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--app-secondary-background-color) inset !important;
+  -webkit-text-fill-color: var(--app-text-color) !important;
+}
+
+.show-password-msg {
+  font-size: 0.8rem;
+  margin-left: 0.5rem;
+  color: var(--app-secondary-text-color);
+}
+
+.show-password-checkbox:hover {
+  cursor: pointer;
+}
+
+.login-form {
+  display: grid;
+  row-gap: 0.8rem;
+  padding: 1rem;
+}
+
+.login-button {
+  background-color: var(--nav-select-background-color);
+  color: var(--nav-select-text-color);
+  font-size: 1rem;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.75rem;
+  transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+  cursor: pointer;
+  background-color: var(--nav-select-hover-background-color);
+}

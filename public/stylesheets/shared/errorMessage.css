@@ -1,0 +1,16 @@
+:root {
+  --error-text-color: #f28b82;
+}
+
+.error-message {
+  color: var(--error-text-color);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.error-symbol {
+  padding-right: 1rem;
+  font-size: 1.25rem;
+}

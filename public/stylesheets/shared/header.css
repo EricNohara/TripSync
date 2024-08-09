@@ -4,11 +4,6 @@
   --nav-link-font-weight: 300;
   --nav-icon-size: 1.25rem;
   --nav-title-icon-size: 2.5rem;
-  --nav-hover-background-color: #37393b;
-  --nav-select-background-color: #004a77;
-  --nav-select-hover-background-color: #015d97;
-  --nav-select-text-color: #c2e7ff;
-  --nav-text-color: rgb(228, 228, 228);
 }
 
 .header-title {
@@ -42,7 +37,7 @@
 
 .header-nav li a {
   text-decoration: none;
-  color: var(--nav-text-color);
+  color: var(--app-text-color);
   font-weight: var(--nav-link-font-weight);
   padding: 0.25rem 1.25rem;
 }
