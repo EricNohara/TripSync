@@ -1,4 +1,5 @@
 :root {
   --app-font-family: "Hind", sans-serif;
-  --app-text-color: black;
+  --app-text-color: rgb(228, 228, 228);
+  --app-background-color: #1b1b1b;
 }
