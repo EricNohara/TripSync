@@ -126,6 +126,7 @@ router.get("/:tripID", verifyToken, async (req, res) => {
       tripFiles: tripFiles,
       sortBy: sortBy || "",
       filterUser: filterUser || "",
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     res.redirect("/");
@@ -148,6 +149,7 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
       users: users,
       errorMessage: errorMessage,
       successMessage: successMessage,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     res.redirect(`/tripFolders/${req.params.tripID}`);
@@ -264,6 +266,7 @@ router.get("/:tripID/editFolder", verifyToken, async (req, res) => {
     res.render("tripFolders/folderPage/editFolder", {
       tripFolder: tripFolder,
       user: user,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     res.redirect(`/tripFolders/${req.params.tripID}`);
@@ -285,6 +288,7 @@ router.put("/:tripID", verifyToken, async (req, res) => {
       errorMessage: "Error Updating Folder",
       user: user,
       tripFolder: tripFolder,
+      selectedNav: "tripFolders",
     });
   }
 });
@@ -320,6 +324,7 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
       tripFolder: tripFolder,
       errorMessage: "Error Deleting Folder",
       user: user,
+      selectedNav: "tripFolders",
     });
   }
 });
@@ -332,12 +337,14 @@ router.get("/:tripID/addFile", verifyToken, async (req, res) => {
     res.render("tripFiles/addFile", {
       tripFolder: tripFolder,
       user: user,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     res.render("tripFolders/folderPage/show", {
       tripFolder: tripFolder,
       errorMessage: "Cannot add file at this time",
       user: user,
+      selectedNav: "tripFolders",
     });
   }
 });
@@ -372,6 +379,7 @@ router.post(
         tripFolder: tripFolder,
         errorMessage: "Cannot add file at this time",
         user: user,
+        selectedNav: "tripFolders",
       });
     }
   }
@@ -389,6 +397,7 @@ router.get("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
       tripFolder: tripFolder,
       tripFile: tripFile,
       errorMessage: errorMessage,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     err = setWildcardError(err, "Error Editing Trip File");
@@ -472,6 +481,7 @@ router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
       user: user,
       tripFile: tripFile,
       uploadedBy: uploadedBy.username,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     err = setWildcardError(err, "Error Displaying Trip File");
@@ -495,6 +505,7 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
       user: user,
       tripFolders: tripFolders,
       errorMessage: errorMessage,
+      selectedNav: "tripFolders",
     });
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
@@ -521,6 +532,7 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
     return res.render(`tripFolders/${folderType}`, {
       user: user,
       searchOptions: req.query,
+      selectedNav: "tripFolders",
       errorMessage:
         "User must be a shared account to access! Please update user information.",
     });
@@ -535,6 +547,7 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
       tripFolders: tripFolders,
       user: user,
       searchOptions: req.query,
+      selectedNav: "tripFolders",
     });
   } catch {
     res.redirect("/");

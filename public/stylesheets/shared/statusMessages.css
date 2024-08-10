@@ -1,0 +1,23 @@
+.error-message {
+  color: var(--app-error-color);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.error-symbol {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.success-message {
+  color: var(--app-success-color);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.success-symbol {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+}

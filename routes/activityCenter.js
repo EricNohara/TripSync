@@ -78,6 +78,7 @@ router.get("/", verifyToken, async (req, res) => {
       outgoingRequests: outgoingRequests,
       formattedNotifications: formattedNotifications.reverse(),
       errorMessage: errorMessage,
+      selectedNav: "activityCenter",
     });
   } catch (err) {
     err = setWildcardError(err, "Error displaying activity center");

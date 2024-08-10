@@ -1,6 +1,7 @@
 // Route for login, log out, and sign up
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const TripFolder = require("../models/tripFolder");
@@ -17,6 +18,7 @@ const {
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
+const sendPasswordResetEmail = require("../public/javascripts/sendEmail");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
@@ -27,15 +29,120 @@ router.get("/", verifyToken, async (req, res) => {
       users: users,
       user: user,
       searchOptions: req.query,
+      selectedNav: "users",
     });
   } catch (err) {
     res.redirect("/");
   }
 });
 
+// Forgot Password Route
+router.get("/forgotPassword", (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  const successMessage = req.query.successMessage
+    ? req.query.successMessage
+    : null;
+  res.render("users/forgotPassword", {
+    errorMessage: errorMessage,
+    successMessage: successMessage,
+  });
+});
+
+// Send Reset Password Email Route
+router.post("/sendPasswordResetEmail", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) throw new CustomErr("Invalid Email");
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    user.passwordResetTokenExpires = Date.now() + 3600000; // 1 hour expiration
+    await user.save();
+
+    const resetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/users/resetPassword?user=${user.id}&token=${resetToken}`;
+
+    const subject = "TripSync Password Reset";
+    const htmlString = `<p>Click the link to reset your password.</p><a href=${resetUrl}>Reset Password</a>`;
+    const { success, message } = await sendPasswordResetEmail(
+      user,
+      subject,
+      htmlString
+    );
+
+    if (!success) throw new CustomErr(message);
+
+    res.redirect(`/users/forgotPassword?successMessage=${message}`);
+  } catch (err) {
+    err = setWildcardError(err, "Error sending email");
+    res.redirect(queryAppendError("/users/forgotPassword", err));
+  }
+});
+
+// Reset Password Route
+router.get("/resetPassword", async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
+  try {
+    const user = await User.findById(req.query.user);
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(req.query.token)
+      .digest("hex");
+
+    if (hashedToken !== user.passwordResetToken)
+      throw new CustomErr(
+        "Invalid token: resend verification email to continue"
+      );
+
+    if (Date.now() > user.passwordResetTokenExpires)
+      throw new CustomErr(
+        "Expired token: resend verification email to continue"
+      );
+
+    res.render("users/resetPassword", {
+      user: user,
+      errorMessage: errorMessage,
+      token: req.query.token,
+    });
+  } catch (err) {
+    err = setWildcardError(
+      err,
+      "Error validating token: resend verification email to continue"
+    );
+    res.redirect(queryAppendError("/users/forgotPassword", err));
+  }
+});
+
+// Resetting User Password Put Route
+router.put("/resetPassword", async (req, res) => {
+  try {
+    if (req.body.newPassword !== req.body.confirmPassword)
+      throw new CustomErr("Passwords must match");
+
+    const user = await User.findById(req.query.user);
+    const newHashedPassword = await bcrypt.hash(req.body.newPassword, 10);
+
+    user.password = newHashedPassword;
+    user.passwordResetToken = null;
+    user.passwordResetTokenExpires = null;
+    await user.save();
+    res.redirect("/users/login");
+  } catch (err) {
+    err = setWildcardError(err, "Error Resetting Password");
+    res.redirect(
+      `/users/resetPassword?user=${req.query.user}&token=${req.query.token}&errorMessage=${err.message}`
+    );
+  }
+});
+
 // Login Route
 router.get("/login", (req, res) => {
-  res.render("users/login");
+  res.render("users/login", { selectedNav: "login" });
 });
 
 //User Login Authentication Route
@@ -50,7 +157,7 @@ router.post("/login", async (req, res) => {
       req.body.password,
       user.password
     );
-    if (!passwordMatch) throw new CustomErr("Password Incorrect");
+    if (!passwordMatch) throw new CustomErr("Password incorrect");
 
     // Generate JWT token
     const token = jwt.sign({ userID: user.id }, process.env.JWT_SECRET, {
@@ -59,8 +166,11 @@ router.post("/login", async (req, res) => {
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
     res.redirect("/");
   } catch (err) {
-    err = setWildcardError(err, "Error: Something went wrong");
-    res.render("users/login", { errorMessage: err.message });
+    err = setWildcardError(err, "Error: something went wrong");
+    res.render("users/login", {
+      errorMessage: err.message,
+      selectedNav: "login",
+    });
   }
 });
 
@@ -109,19 +219,23 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Edit User Info Route
-router.get("/edit", verifyToken, async (req, res) => {
+// Edit User Info Route in Settings
+router.get("/settings", verifyToken, async (req, res) => {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     const user = await retrieveUser(req, res);
-    res.render("users/edit", { user: user, errorMessage: errorMessage });
+    res.render("users/settings", {
+      user: user,
+      errorMessage: errorMessage,
+      selectedNav: "settings",
+    });
   } catch (err) {
     err = setWildcardError(err, "Error editing user");
     res.redirect(queryAppendError("/", err));
   }
 });
 
-router.put("/edit", verifyToken, async (req, res) => {
+router.put("/settings", verifyToken, async (req, res) => {
   try {
     if (!isAlphaNumeric(req.body.username))
       throw new CustomErr("Username must contain only alphanumeric characters");
@@ -159,7 +273,7 @@ router.put("/edit", verifyToken, async (req, res) => {
     res.redirect("/");
   } catch (err) {
     err = setWildcardError(err, "Error updating user");
-    res.redirect(queryAppendError("/users/edit", err));
+    res.redirect(queryAppendError("/users/settings", err));
   }
 });
 

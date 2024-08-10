@@ -1,7 +1,7 @@
 @import "shared/variables.css";
 @import "shared/header.css";
 @import "shared/login.css";
-@import "shared/errorMessage.css";
+@import "shared/statusMessages.css";
 
 :root {
   font-family: var(--app-font-family);

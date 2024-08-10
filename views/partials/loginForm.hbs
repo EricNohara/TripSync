@@ -1,4 +1,4 @@
-<form action="{{formAction}}" method="POST">
+<form class="login-form" action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
   <div>
     {{#if user}}
@@ -10,19 +10,27 @@
     {{/if}}
   </div>
   {{/if}}
-  <div>
+  <div class="text-input">
     {{#if user}}
       <label>Email</label>
       <input type="text" name="email" value="{{user.email}}" required />
     {{else}}
-      <label>Email</label>
-      <input type="text" name="email" required />
+      <input type="text" name="email" placeholder="Email" required />
     {{/if}}
   </div>
-  <div>
-      <label>{{#if user}}Current Password{{else}}Password{{/if}}</label>
-      <input type="text" name="password" required>
-    {{! <input type="pasword" name="password" required /> }}
+  <div class="text-input">
+      {{#if user}}
+        <label>Current Password</label>
+      {{/if}}
+      <input id="password" type="password" name="password" placeholder="Password" required>
+  </div>
+  <div class="password-utils">
+    <div>
+      <input class="show-password-checkbox" type="checkbox" onclick="togglePasswordType()"><span class="show-password-msg">Show Password</span>
+    </div>
+    {{#unless (isRegisterForm loginOrRegister)}}
+      <a class="forgot-password" href="/users/forgotPassword">Forgot Password?</a>
+    {{/unless}}
   </div>
   {{#if user}}
     <div>
@@ -46,6 +54,6 @@
     <button type="submit">Update</button>
     <a href="/users/delete">Delete User</a>
   {{else}}
-    <button type="submit">{{loginOrRegister}}</button>
+    <button class="form-submit-button" type="submit">{{loginOrRegister}}</button>
   {{/if}}
 </form>

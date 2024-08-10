@@ -1,15 +1,64 @@
 <header>
-  <nav>
-    <a href="/">TripSync</a>
+  <nav class="header-nav">
+    <a class="header-title" href="/">
+      <span class="material-symbols-outlined title-icon" {{#if (equals selectedNav "home")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>airplane_ticket</span>
+      TripSync
+    </a>
     <ul>
       {{#if user}}
-        <li><a href="/users/logout">Log Out</a></li>
-        <li><a href="/users/edit">Edit User</a></li>
-        <li><a href="/tripFolders">Trip Folders</a></li>
-        <li><a href="/activityCenter">Activity Center</a></li>
-        <li><a href="/users">Search Users</a></li>
+        <li>
+          <div class="select-oval {{#if (equals selectedNav "tripFolders")}}selected{{/if}}">
+            <a class="nav-link" href="/tripFolders">
+              <span class="material-symbols-outlined" {{#if (equals selectedNav "tripFolders")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>folder</span>
+              Folders
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="select-oval {{#if (equals selectedNav "activityCenter")}}selected{{/if}}">
+            <a class="nav-link" href="/activityCenter">
+              {{#if (userHasNewNotifs user)}}
+                <span class="material-symbols-outlined">notifications_active</span>
+              {{else}}
+                <span class="material-symbols-outlined" {{#if (equals selectedNav "activityCenter")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>notifications</span>
+              {{/if}}
+              Activity
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="select-oval {{#if (equals selectedNav "users")}}selected{{/if}}">
+            <a class="nav-link" href="/users">
+              <span class="material-symbols-outlined">search</span>
+              Users
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="select-oval {{#if (equals selectedNav "settings")}}selected{{/if}}">
+            <a class="nav-link" href="/users/settings">
+              <span class="material-symbols-outlined" {{#if (equals selectedNav "settings")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>settings</span>
+              Settings
+            </a>
+          </div>
+        </li>
+        <li>
+          <div class="select-oval">
+            <a class="nav-link" href="/users/logout">
+              <span class="material-symbols-outlined">logout</span>
+              Log Out
+            </a>
+          </div>
+        </li>
       {{else}}
-        <li><a href="/users/login">Login</a></li>
+        <li>
+          <div class="select-oval {{#if (equals selectedNav "login")}}selected{{/if}}">
+            <a class="nav-link" href="/users/login">
+              <span class="material-symbols-outlined">login</span>
+              Login
+            </a>
+          </div>
+        </li>
       {{/if}}
     </ul>
   </nav>

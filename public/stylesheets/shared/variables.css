@@ -7,5 +7,7 @@
   --nav-select-hover-background-color: #015d97;
   --nav-select-text-color: #c2e7ff;
   --app-secondary-text-color: rgb(147, 147, 147);
-  --app-secondary-background-color: #232323;
+  --app-secondary-background-color: #323232;
+  --app-error-color: #f28b82;
+  --app-success-color: #81c995;
 }

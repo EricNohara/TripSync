@@ -40,6 +40,9 @@ const hbs = require("express-handlebars").create({
     userHasGtxNotifs: (count, x) => {
       return count > x;
     },
+    userHasNewNotifs: (user) => {
+      return user.newNotificationCount > 0 ? true : false;
+    },
   },
 });
 
