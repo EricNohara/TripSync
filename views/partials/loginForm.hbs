@@ -1,14 +1,13 @@
 <form class="login-form" action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
-  <div>
-    {{#if user}}
+    <div>
+      {{#if user}}
         <label>Username</label>
-        <input type="text" name="username" value="{{user.username}}" required/>
-    {{else}}
-        <label>Username</label>
-        <input type="text" name="username" required />
-    {{/if}}
-  </div>
+        <input type="text" name="username" value="{{user.username}}" required />
+      {{else}}
+        <input type="text" name="username" placeholder="Username" required />
+      {{/if}}
+    </div>
   {{/if}}
   <div class="text-input">
     {{#if user}}
@@ -19,14 +18,24 @@
     {{/if}}
   </div>
   <div class="text-input">
-      {{#if user}}
-        <label>Current Password</label>
-      {{/if}}
-      <input id="password" type="password" name="password" placeholder="Password" required>
+    {{#if user}}
+      <label>Current Password</label>
+    {{/if}}
+    <input
+      id="password"
+      type="password"
+      name="password"
+      placeholder="Password"
+      required
+    />
   </div>
   <div class="password-utils">
     <div>
-      <input class="show-password-checkbox" type="checkbox" onclick="togglePasswordType()"><span class="show-password-msg">Show Password</span>
+      <input
+        class="show-password-checkbox"
+        type="checkbox"
+        onclick="togglePasswordType()"
+      /><span class="show-password-msg">Show Password</span>
     </div>
     {{#unless (isRegisterForm loginOrRegister)}}
       <a class="forgot-password" href="/users/forgotPassword">Forgot Password?</a>
@@ -39,14 +48,18 @@
     </div>
   {{/if}}
   {{#if (isRegisterForm loginOrRegister)}}
-    <div>
-      <label>Account Type</label>
+    <div class="radio-container">
+      <label>Account Privacy</label>
       {{#if user}}
         <input type="radio" name="isPrivate" value="true" {{#if user.isPrivate}}checked{{/if}} />Private
         <input type="radio" name="isPrivate" value="false" {{#unless user.isPrivate}}checked{{/unless}} />Public
       {{else}}
-        <input type="radio" name="isPrivate" value="true" />Private
-        <input type="radio" name="isPrivate" value="false" checked />Public
+      <div class="radio-container">
+        <input type="radio" name="isPrivate" value="true" /><span>Private</span>
+      </div>
+      <div class="radio-container">
+        <input type="radio" name="isPrivate" value="false" checked /><span>Public</span>
+      </div>
       {{/if}}
     </div>
   {{/if}}
@@ -54,6 +67,9 @@
     <button type="submit">Update</button>
     <a href="/users/delete">Delete User</a>
   {{else}}
-    <button class="form-submit-button" type="submit">{{loginOrRegister}}</button>
+    <button
+      class="form-submit-button"
+      type="submit"
+    >{{loginOrRegister}}</button>
   {{/if}}
 </form>

@@ -68,7 +68,7 @@ router.post("/sendPasswordResetEmail", async (req, res) => {
     )}/users/resetPassword?user=${user.id}&token=${resetToken}`;
 
     const subject = "TripSync Password Reset";
-    const htmlString = `<p>Click the link to reset your password.</p><a href=${resetUrl}>Reset Password</a>`;
+    const htmlString = `<p>Click the link below to reset your password.</p><a href=${resetUrl}>Reset Password</a>`;
     const { success, message } = await sendPasswordResetEmail(
       user,
       subject,

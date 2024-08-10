@@ -1,6 +1,11 @@
-{{> errorMessage}}
-{{> loginForm formAction="/users/register" loginOrRegister="Sign Up"}}
-<div>
-    <p>Already have an account?</p>
-    <a href="/users/login">Log In</a>
+<div class="container register-container">
+    <div class="input-form-container">
+        <h1 class="input-form-title">Sign Up</h1>
+        {{> errorMessage}}
+        {{> loginForm formAction="/users/register" loginOrRegister="Sign Up"}}
+        <div class="form-message">
+            <span>Already have an account?</span>
+            <a class="form-link" href="/users/login">Log In</a>
+        </div>
+    </div>
 </div>
