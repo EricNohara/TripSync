@@ -1,6 +1,6 @@
 @import "shared/variables.css";
 @import "shared/header.css";
-@import "shared/login.css";
+@import "shared/formInputs.css";
 @import "shared/statusMessages.css";
 
 :root {

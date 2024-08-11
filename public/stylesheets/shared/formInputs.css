@@ -3,7 +3,8 @@
   align-items: center;
   justify-content: center;
   background-color: var(--app-secondary-background-color);
-  width: 65%;
+  width: 700px;
+  min-width: 700px;
   margin: auto;
   margin-top: 3rem;
   border-radius: 2rem;
@@ -19,6 +20,13 @@
   justify-self: center;
   margin-bottom: 0.5rem;
   margin-top: 1.5rem;
+}
+
+.input-form-subtitle {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0;
+  margin-bottom: 0.75rem;
 }
 
 .form-link {
@@ -103,13 +111,6 @@ input:-webkit-autofill:active {
   margin-top: 1rem;
 }
 
-.send-email-instructions {
-  font-size: 1rem;
-  font-weight: 400;
-  margin: 0;
-  margin-bottom: 0.75rem;
-}
-
 /* Radio */
 input[type="radio"] {
   -webkit-appearance: none;
@@ -150,4 +151,13 @@ input[type="radio"]:checked::before {
 
 .register-container {
   margin-top: 0;
+}
+
+.delete-button {
+  background-color: var(--app-second-warning-color);
+  color: var(--app-third-warning-color);
+}
+
+.delete-button:hover {
+  background-color: var(--app-fourth-warning-color);
 }

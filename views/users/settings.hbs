@@ -1,2 +1,10 @@
-{{> errorMessage}}
-{{> loginForm formAction="/users/settings?_method=PUT" loginOrRegister="Sign Up" user=user}}
+<div class="container">
+    <div class="input-form-container">
+        <h1 class="input-form-title">Settings</h1>
+        {{> errorMessage}}
+        {{> loginForm formAction="/users/settings?_method=PUT" loginOrRegister="Sign Up" user=user}}
+        <div class="form-message">
+            <a class="form-link" href="/users/register">Return</a>
+        </div>
+    </div>
+</div>  

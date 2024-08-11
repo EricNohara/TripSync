@@ -1,34 +1,26 @@
 <form class="login-form" action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
     <div>
-      {{#if user}}
-        <label>Username</label>
-        <input type="text" name="username" value="{{user.username}}" required />
-      {{else}}
-        <input type="text" name="username" placeholder="Username" required />
-      {{/if}}
+      <input type="text" name="username" {{#if user}}value="{{user.username}}"{{/if}} placeholder="Username" required />
     </div>
   {{/if}}
   <div class="text-input">
-    {{#if user}}
-      <label>Email</label>
-      <input type="text" name="email" value="{{user.email}}" required />
-    {{else}}
-      <input type="text" name="email" placeholder="Email" required />
-    {{/if}}
+    <input type="text" name="email" {{#if user}}value="{{user.email}}"{{/if}} placeholder="Email" required />
   </div>
   <div class="text-input">
-    {{#if user}}
-      <label>Current Password</label>
-    {{/if}}
-    <input
-      id="password"
+      <input
+      class="password-input"
       type="password"
       name="password"
-      placeholder="Password"
+      placeholder={{#if user}}"Current Password"{{else}}"Password"{{/if}}
       required
     />
   </div>
+  {{#if user}}
+    <div>
+      <input class="password-input" type="password" name="newPassword" placeholder="Updated Password" required />
+    </div>
+  {{/if}}
   <div class="password-utils">
     <div>
       <input
@@ -41,31 +33,20 @@
       <a class="forgot-password" href="/users/forgotPassword">Forgot Password?</a>
     {{/unless}}
   </div>
-  {{#if user}}
-    <div>
-      <label>Updated Password</label>
-      <input type="text" name="newPassword" required />
-    </div>
-  {{/if}}
   {{#if (isRegisterForm loginOrRegister)}}
     <div class="radio-container">
       <label>Account Privacy</label>
-      {{#if user}}
-        <input type="radio" name="isPrivate" value="true" {{#if user.isPrivate}}checked{{/if}} />Private
-        <input type="radio" name="isPrivate" value="false" {{#unless user.isPrivate}}checked{{/unless}} />Public
-      {{else}}
       <div class="radio-container">
-        <input type="radio" name="isPrivate" value="true" /><span>Private</span>
+        <input type="radio" name="isPrivate" value="true" {{#if user}}{{#if user.isPrivate}}checked{{/if}}{{/if}} />Private
       </div>
       <div class="radio-container">
-        <input type="radio" name="isPrivate" value="false" checked /><span>Public</span>
+        <input type="radio" name="isPrivate" value="false" {{#if user}}{{#unless user.isPrivate}}checked{{/unless}}{{/if}} />Public
       </div>
-      {{/if}}
     </div>
   {{/if}}
   {{#if user}}
-    <button type="submit">Update</button>
-    <a href="/users/delete">Delete User</a>
+    <button class="form-submit-button" type="submit">Update</button>
+    <button class="form-submit-button delete-button" type="submit" name="action" value="delete" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">Delete User</button>
   {{else}}
     <button
       class="form-submit-button"

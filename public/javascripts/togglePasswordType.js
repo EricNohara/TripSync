@@ -1,8 +1,11 @@
+const passwordInputs = document.querySelectorAll(".password-input");
+
 function togglePasswordType() {
-  var x = document.getElementById("password");
-  if (x.type === "password") {
-    x.type = "text";
-  } else {
-    x.type = "password";
-  }
+  passwordInputs.forEach((x) => {
+    if (x.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  });
 }

@@ -237,6 +237,9 @@ router.get("/settings", verifyToken, async (req, res) => {
 
 router.put("/settings", verifyToken, async (req, res) => {
   try {
+    const formAction = req.body.action;
+    if (formAction === "delete") return res.redirect("/users/delete");
+
     if (!isAlphaNumeric(req.body.username))
       throw new CustomErr("Username must contain only alphanumeric characters");
 

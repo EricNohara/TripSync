@@ -8,6 +8,9 @@
   --nav-select-text-color: #c2e7ff;
   --app-secondary-text-color: rgb(147, 147, 147);
   --app-secondary-background-color: #323232;
-  --app-error-color: #f28b82;
+  --app-warning-color: #f28b82;
+  --app-second-warning-color: #eb4b3d;
+  --app-third-warning-color: #f9cbc7;
+  --app-fourth-warning-color: #ed6054;
   --app-success-color: #81c995;
 }
