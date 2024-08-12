@@ -548,6 +548,7 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
       user: user,
       searchOptions: req.query,
       selectedNav: "tripFolders",
+      folderType: folderType,
     });
   } catch {
     res.redirect("/");

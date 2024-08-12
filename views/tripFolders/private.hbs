@@ -1,12 +1,17 @@
-<h1>{{user.username}}'s Private Trips</h1>
-<form action="/tripFolders/private" method="GET">
-  <label>Folder Name</label>
-  <input type="text" name="folderName" value="{{searchOptions.folderName}}" />
-  <button type="submit">Search</button>
-</form>
-<ul>
-  {{#each tripFolders}}
-    <li><a href="/tripFolders/{{this.id}}">{{this.folderName}}</a></li>
-  {{/each}}
-</ul>
-<a href="/tripFolders">Return</a>
+<div class="folder-content-container">
+    {{> tripFolderNav}}
+    <div class="folder-content-background">
+      <h1>{{user.username}}'s Private Trips</h1>
+      <form action="/tripFolders/private" method="GET">
+        <label>Folder Name</label>
+        <input type="text" name="folderName" value="{{searchOptions.folderName}}" />
+        <button type="submit">Search</button>
+      </form>
+      <ul>
+        {{#each tripFolders}}
+          <li><a href="/tripFolders/{{this.id}}">{{this.folderName}}</a></li>
+        {{/each}}
+      </ul>
+      <a href="/tripFolders">Return</a>
+    </div>
+</div>

@@ -8,15 +8,15 @@
   </a>
   <div class="folder-links">
     <a href="/tripFolders/private">
-      <div class="folder">
-        <span class="material-symbols-outlined folder-icon">
+      <div class="folder {{#if (isFolderPrivate folderType)}}selected{{/if}}">
+        <span class="material-symbols-outlined folder-icon" {{#if (isFolderPrivate folderType)}}style="font-variation-settings: 'FILL' 1;"{{/if}}>
           lock
         </span>Private
       </div>
     </a>
     <a href="/tripFolders/shared">
-      <div class="folder">
-        <span class="material-symbols-outlined folder-icon">
+      <div class="folder {{#unless (isFolderPrivate folderType)}}selected{{/unless}}">
+        <span class="material-symbols-outlined folder-icon" {{#unless (isFolderPrivate folderType)}}style="font-variation-settings: 'FILL' 1;"{{/unless}}>
           share
         </span>Shared
       </div>
