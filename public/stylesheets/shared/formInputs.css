@@ -149,3 +149,14 @@ input[type="radio"]:checked::before {
 .delete-button:hover {
   background-color: var(--app-fourth-warning-color);
 }
+
+input[type="date"] {
+  background-color: transparent;
+  color: var(--app-text-color);
+  border: none;
+  border: 2px solid var(--app-text-color);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  padding: 0.75rem;
+  width: 100%;
+}
