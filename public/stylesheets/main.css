@@ -2,6 +2,7 @@
 @import "shared/header.css";
 @import "shared/formInputs.css";
 @import "shared/statusMessages.css";
+@import "shared/tripFolders.css";
 
 :root {
   font-family: var(--app-font-family);
@@ -19,4 +20,21 @@
 /* For Google Symbols */
 .material-symbols-outlined {
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--app-secondary-background-color);
+  width: 700px;
+  min-width: 700px;
+  margin: auto;
+  margin-top: 3rem;
+  border-radius: 2rem;
+}
+
+a {
+  text-decoration: none;
+  color: var(--app-text-color);
 }
