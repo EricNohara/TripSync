@@ -76,5 +76,5 @@
 }
 
 .selected:hover {
-  background-color: var(--nav-select-hover-background-color);
+  background-color: var(--nav-select-hover-background-color) !important;
 }

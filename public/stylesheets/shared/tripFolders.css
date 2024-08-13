@@ -77,3 +77,115 @@
   background-color: #4c4e51;
   border-radius: 2rem;
 }
+
+.trip-folder-page-title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding: 0;
+  margin: 0;
+  margin-bottom: 1rem;
+}
+
+.folder-search-form {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.search-folder {
+  font-size: 0.85rem !important;
+  background-color: var(--search-background-color) !important;
+  border: none !important;
+  border-radius: 2rem !important;
+}
+
+.search-folder:focus {
+  outline: none;
+}
+
+.folder-content {
+  display: grid;
+  margin: 1.25rem 2rem;
+  font-size: 1rem;
+}
+
+.folders-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.folder-list-item {
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--nav-hover-background-color);
+  display: grid;
+  grid-template-columns: 60% 20% 20%;
+  align-items: center;
+}
+
+.folders-list li:first-child {
+  border-top: 1px solid var(--nav-hover-background-color);
+}
+
+.folder-list-item:hover {
+  cursor: pointer;
+  background-color: var(--nav-hover-background-color);
+}
+
+.folder-page-header {
+  display: grid;
+  grid-template-columns: 60% 20% 20%;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.folder-page-header p {
+  margin: 0;
+}
+
+.folder-list-icon {
+  margin-left: 0.5rem;
+  margin-right: 1rem;
+  color: var(--app-secondary-text-color);
+}
+
+.user-icon {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.folder-list-item p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.dimmed {
+  color: var(--app-secondary-text-color);
+}
+
+.search-symbol {
+  margin: 0;
+  padding: 0.25rem;
+}
+
+.search-form-background {
+  width: 100%;
+  background-color: var(--search-background-color);
+  display: flex;
+  border-radius: 2rem;
+  padding: 0.1rem;
+}
+
+.search-submit {
+  border-radius: 2rem;
+  border: none;
+  background-color: var(--search-background-color);
+  color: var(--app-secondary-text-color);
+}
+
+.search-submit:hover {
+  cursor: pointer;
+  background-color: var(--nav-hover-background-color);
+}

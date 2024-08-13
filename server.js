@@ -43,9 +43,6 @@ const hbs = require("express-handlebars").create({
     userHasNewNotifs: (user) => {
       return user.newNotificationCount > 0 ? true : false;
     },
-    isFolderPrivate: (type) => {
-      return type === "private";
-    },
   },
 });
 
