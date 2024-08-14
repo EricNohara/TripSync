@@ -66,7 +66,6 @@
   overflow-y: scroll;
   height: 100%;
   font-size: 1.7rem;
-  padding-right: 12px;
 }
 
 .folder-content-background::-webkit-scrollbar {
@@ -88,17 +87,16 @@
 
 .folder-search-form {
   display: flex;
-  margin-bottom: 1rem;
 }
 
-.search-folder {
+.search-input {
   font-size: 0.85rem !important;
   background-color: var(--search-background-color) !important;
   border: none !important;
   border-radius: 2rem !important;
 }
 
-.search-folder:focus {
+.search-input:focus {
   outline: none;
 }
 
@@ -120,6 +118,18 @@
   display: grid;
   grid-template-columns: 60% 20% 20%;
   align-items: center;
+}
+
+.ellipsis-overflow {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 80%;
+}
+
+.folder-name {
+  display: flex;
+  max-width: 27rem;
 }
 
 .folders-list li:first-child {
@@ -188,4 +198,78 @@
 .search-submit:hover {
   cursor: pointer;
   background-color: var(--nav-hover-background-color);
+}
+
+.folder-tree {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.folder-tree-item {
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding: 0;
+  margin: 0;
+  margin-left: 0.5rem;
+}
+
+.folder-tree-return-link {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+.folder-tree-return-link:hover {
+  background-color: var(--nav-hover-background-color);
+}
+
+.chevron-icon {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: var(--app-secondary-text-color);
+}
+
+.user-display {
+  margin: 0;
+  border-bottom: 1px solid var(--nav-hover-background-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.display-username {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.add-icon {
+  margin: 0;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.submit-add-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+  border: none;
+  border-radius: 50%;
+  background-color: inherit;
+  color: var(--app-text-color);
+  padding: 0;
+}
+
+.submit-add-user:hover {
+  cursor: pointer;
+  background-color: var(--nav-hover-background-color);
+}
+
+.add-user-content {
+  row-gap: 1rem;
 }

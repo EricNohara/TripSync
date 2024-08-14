@@ -3,7 +3,6 @@ if (process.env.NODE_ENV !== "production") require("dotenv").config();
 const express = require("express");
 const methodOverride = require("method-override");
 const cookieParser = require("cookie-parser");
-const User = require("./models/user");
 const app = express();
 const port = 8080;
 
@@ -37,11 +36,17 @@ const hbs = require("express-handlebars").create({
     equals: (a, b) => {
       return a === b;
     },
-    userHasGtxNotifs: (count, x) => {
-      return count > x;
+    greater: (x, y) => {
+      return x > y;
     },
     userHasNewNotifs: (user) => {
       return user.newNotificationCount > 0 ? true : false;
+    },
+    shortenWordX: (word, x) => {
+      return word.slice(0, x);
+    },
+    strlen: (str) => {
+      return str.length;
     },
   },
 });

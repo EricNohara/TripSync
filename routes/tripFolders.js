@@ -150,6 +150,7 @@ router.get("/:tripID/addUser", verifyToken, async (req, res) => {
       errorMessage: errorMessage,
       successMessage: successMessage,
       selectedNav: "tripFolders",
+      searchOptions: req.query,
     });
   } catch (err) {
     res.redirect(`/tripFolders/${req.params.tripID}`);
@@ -208,7 +209,7 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
   } catch (err) {
     err = setWildcardError(err, "Error adding selected user");
     res.redirect(
-      queryAppendError(`/tripFolders/${req.params.tripID}/addUser`, err)
+      `/tripFolders/${req.params.tripID}/addUser?username=${req.query.username}&errorMessage=${err.message}`
     );
   }
 });

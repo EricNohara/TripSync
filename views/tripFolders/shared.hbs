@@ -2,7 +2,7 @@
     {{> tripFolderNav}}
     <div class="folder-content-background">
       <div class="folder-content">
-        <h1 class="trip-folder-page-title">Shared Trip Folders</h1>
+        <h1 class="trip-folder-page-title">Shared Folders</h1>
         {{#if errorMessage}}
           {{> errorMessage}}
         {{else}}
@@ -19,14 +19,17 @@
             {{#each tripFolders}}
               <a href="/tripFolders/{{this.id}}">
                 <li class="folder-list-item">
-                  <p><span
-                    class="material-symbols-outlined folder-list-icon"
-                    style="font-variation-settings: 'FILL' 1;"
-                  >
-                    folder
-                  </span>
-                  {{this.folderName}}
-                  </p>
+                  <div class="folder-name">
+                    <span
+                      class="material-symbols-outlined folder-list-icon"
+                      style="font-variation-settings: 'FILL' 1;"
+                    >
+                      folder
+                    </span>
+                    <div class="ellipsis-overflow">
+                      {{this.folderName}}
+                    </div>
+                  </div>
                   <p class="dimmed">{{convertReadableDate this.tripDate}}</p>
                   <p class="dimmed"><span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span>Me</p>
                 </li>

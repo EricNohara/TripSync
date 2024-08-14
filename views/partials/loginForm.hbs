@@ -1,11 +1,11 @@
 <form class="login-form" action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
     <div>
-      <input type="text" name="username" {{#if user}}value="{{user.username}}"{{/if}} placeholder="Username" required />
+      <input type="text" name="username" {{#if user}}value="{{user.username}}"{{/if}} placeholder="Username" required maxlength="36" />
     </div>
   {{/if}}
   <div class="text-input">
-    <input type="text" name="email" {{#if user}}value="{{user.email}}"{{/if}} placeholder="Email" required />
+    <input type="text" name="email" {{#if user}}value="{{user.email}}"{{/if}} placeholder="Email" required maxlength="254" />
   </div>
   <div class="text-input">
       <input

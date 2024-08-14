@@ -1,24 +1,47 @@
-<h2>Search Users</h2>
-{{> errorMessage}}
-{{> successMessage}}
-<form action="/tripFolders/{{tripFolder.id}}/addUser" method="GET">
-  <label>Username</label>
-  <input type="text" name="username" value="{{searchOptions.username}}" />
-  <button type="submit">Search</button>
-</form>
-<br />
-{{#each users}}
-  <ul>
-    <li>
-      <form
-        method="POST"
-        action="/tripFolders/{{../tripFolder.id}}/addUser?_method=PUT"
-      >
-        <input type="hidden" name="addUsername" value="{{this.username}}" />
-        <label>{{this.username}}</label>
-        <button type="submit">Add</button>
+<div class="folder-content-container">
+  {{> tripFolderNav}}
+  <div class="folder-content-background">
+    <div class="folder-content add-user-content">
+      <div class="folder-tree ellipsis-overflow">
+        {{#if tripFolder.isShared}}
+          <a class="folder-tree-return-link" href="/tripFolders/shared">Shared Folders</a>
+        {{else}}
+          <a class="folder-tree-return-link" href="/tripFolders/private">Private Folders</a>
+        {{/if}}
+        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+        <a href="/tripFolders/{{tripFolder.id}}" class="folder-tree-return-link ellipsis-overflow">{{tripFolder.folderName}}</a>
+        <span class="material-symbols-outlined chevron-icon">chevron_right</span>
+        <h1 class="folder-tree-item">Search Users</h1>
+      </div>
+      {{#if errorMessage}}
+        {{> errorMessage}}
+      {{/if}}
+      {{#if successMessage}}
+        {{> successMessage}}
+      {{/if}}
+      <form autocomplete="off" class="search-form-background" action="/tripFolders/{{tripFolder.id}}/addUser" method="GET">
+        <div class="search-form-background">
+          <input class="search-input" type="text" name="username" value="{{searchOptions.username}}" placeholder="Search Username" />
+          <button class="search-submit" type="submit">
+            <span class="material-symbols-outlined search-symbol">search</span>
+          </button>
+        </div>
       </form>
-    </li>
-  </ul>
-{{/each}}
-<a href="/tripFolders/{{tripFolder.id}}">Return</a>
+      <ul class="folders-list">
+        {{#each users}}
+          <li class="user-list-item">
+            <form
+              method="POST"
+              action="/tripFolders/{{../tripFolder.id}}/addUser?_method=PUT&username={{../searchOptions.username}}"
+              class="user-display"
+            >
+              <input type="hidden" name="addUsername" value="{{this.username}}" />
+              <label class="display-username"><span class="material-symbols-outlined user-icon dimmed" style="font-variation-settings: 'FILL' 1;">account_circle</span>{{this.username}}</label>
+              <button class="submit-add-user" type="submit"><span class="material-symbols-outlined add-icon">add</span></button>
+            </form>
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,19 +1,29 @@
-<h2>Edit Trip Folder</h2>
-<form action="/tripFolders/{{tripFolder.id}}?_method=PUT" method="POST">
-  <label>Trip Folder Name</label>
-  <input
-    type="text"
-    name="folderName"
-    value="{{tripFolder.folderName}}"
-    required
-  />
-  <label>Trip Date</label>
-  <input
-    type="date"
-    name="tripDate"
-    value="{{getDefaultDate tripFolder.tripDate}}"
-    required
-  />
-  <button type="submit">Update</button>
-</form>
-<a href="/tripFolders/{{tripFolder.id}}">Return</a>
+<div class="container">
+  <div class="input-form-container">
+    <h1 class="input-form-title">Edit Trip Folder</h1>
+    <form
+      class="login-form"
+      action="/tripFolders/{{tripFolder.id}}?_method=PUT"
+      method="POST"
+    >
+      <input
+        type="text"
+        name="folderName"
+        value="{{tripFolder.folderName}}"
+        placeholder="Trip Folder Name"
+        required
+      />
+      <input
+        type="date"
+        name="tripDate"
+        value="{{getDefaultDate tripFolder.tripDate}}"
+        placeholder="Trip date"
+        required
+      />
+      <button class="form-submit-button" type="submit">Update</button>
+    </form>
+    <div class="form-message">
+      <a class="form-link" href="/tripFolders/{{tripFolder.id}}">Return</a>
+    </div>
+  </div>
+</div>
