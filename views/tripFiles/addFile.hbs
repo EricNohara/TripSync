@@ -1,17 +1,33 @@
-<h2>Add File</h2>
-<form
-  action="/tripFolders/{{tripFolder.id}}/addFile"
-  enctype="multipart/form-data"
-  method="POST"
->
-  <label>Title</label>
-  <input type="text" name="title" />
-  <label>Date</label>
-  <input type="date" name="userSetDate" value="{{getDefaultDate}}" />
-  <label>Description</label>
-  <textarea name="description"></textarea>
-  <label>Image</label>
-  <input type="file" name="image" accept="image/*" required />
-  <button type="submit">Add</button>
-</form>
-<a href="/tripFolders/{{tripFolder.id}}">Return</a>
+<div class="container">
+  <div class="input-form-container">
+    <h1 class="input-form-title">Add File</h1>
+    <form
+      action="/tripFolders/{{tripFolder.id}}/addFile"
+      enctype="multipart/form-data"
+      method="POST"
+      class="login-form"
+    >
+      <input
+        type="text"
+        name="title"
+        id="title-input"
+        placeholder="File name"
+        required
+      />
+      <input type="date" name="userSetDate" value="{{getDefaultDate}}" />
+      <textarea name="description" placeholder="Description"></textarea>
+      <input
+        class="file-input"
+        type="file"
+        name="image"
+        accept="image/*"
+        id="file-upload-input"
+        required
+      />
+      <button class="form-submit-button" type="submit">Add</button>
+    </form>
+    <div class="form-message">
+      <a class="form-link" href="/tripFolders/{{tripFolder.id}}">Return</a>
+    </div>
+  </div>
+</div>

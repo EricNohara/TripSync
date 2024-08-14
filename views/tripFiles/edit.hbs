@@ -1,29 +1,33 @@
-<h2>Edit Trip File</h2>
-{{> errorMessage}}
-<form
-  action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=PUT"
-  method="POST"
-  enctype="multipart/form-data"
->
-  <label>Title</label>
-  <input type="text" name="title" value="{{tripFile.title}}" />
-  <label>Date</label>
-  <input
-    type="date"
-    name="userSetDate"
-    value="{{convertReadableDate tripFile.userSetDate}}"
-    required
-  />
-  <label>Description</label>
-  <textarea name="description">{{tripFile.description}}</textarea>
-  <label>Image</label>
-  <input type="file" name="image" accept="image/*"/>
-  <button type="submit">Update</button>
-</form>
-<form
-  action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=DELETE"
-  method="POST"
->
-    <button type="submit">Delete</button>
-</form>
-<a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}">Return</a>
+<div class="container">
+  <div class="input-form-container">
+    <h1 class="input-form-title">Edit Trip File</h1>
+    {{> errorMessage}}
+    <form
+      action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=PUT"
+      method="POST"
+      enctype="multipart/form-data"
+      class="login-form edit-file-form"
+    >
+      <input id="title-edit-input" type="text" name="title" value="{{tripFile.title}}" placeholder="File name" required />
+      <input
+        type="date"
+        name="userSetDate"
+        value="{{convertReadableDate tripFile.userSetDate}}"
+        required
+      />
+      <textarea name="description" placeholder="Description">{{tripFile.description}}</textarea>
+      <input class="file-input" id="file-edit-upload-input" type="file" name="image" accept="image/*"/>
+      <button class="form-submit-button" type="submit">Update</button>
+    </form>
+    <form
+      action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=DELETE"
+      method="POST"
+      class="login-form delete-button-form"
+    >
+        <button class="form-submit-button delete-button" type="submit">Delete</button>
+    </form>
+    <div class="form-message">
+      <a class="form-link" href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}">Return</a>
+    </div>
+  </div>
+</div>
