@@ -23,7 +23,10 @@ const {
   uploadToS3Middleware,
   deleteFromS3,
   calculateSHA256,
+  downloadFromS3,
 } = require("../public/javascripts/multerSetup");
+const tripFolder = require("../models/tripFolder");
+const tripFile = require("../models/tripFile");
 
 // Default Routes That Redirect to Correct User's Route
 router.get("/", verifyToken, async (req, res) => {
@@ -470,7 +473,27 @@ router.delete("/:tripID/:fileID/editFile", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/:tripID/:fileID/download", verifyToken, async (req, res) => {
+  try {
+    const { tripID, fileID } = req.params;
+    const user = await retrieveUser(req, res);
+    const tripFolder = await TripFolder.findById(tripID);
+    const tripFile = await TripFile.findById(fileID);
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: tripFile.imageURL.split("/").at(-1),
+    };
+    await downloadFromS3(res, params);
+  } catch (err) {
+    err = setWildcardError(err, "Cannot download file at this time");
+    res.redirect(
+      queryAppendError(`/tripFolders/${tripFolder.id}/${tripFile.id}`, err)
+    );
+  }
+});
+
 router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
+  const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     const { tripID, fileID } = req.params;
     const user = await retrieveUser(req, res);
@@ -484,6 +507,7 @@ router.get("/:tripID/:fileID", verifyToken, async (req, res) => {
       tripFile: tripFile,
       uploadedBy: uploadedBy.username,
       selectedNav: "tripFolders",
+      errorMessage: errorMessage,
     });
   } catch (err) {
     err = setWildcardError(err, "Error Displaying Trip File");

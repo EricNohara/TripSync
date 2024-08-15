@@ -1,5 +1,9 @@
 const multer = require("multer");
-const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} = require("@aws-sdk/client-s3");
 const { Upload } = require("@aws-sdk/lib-storage");
 const sharp = require("sharp");
 const stream = require("stream");
@@ -83,10 +87,27 @@ async function deleteFromS3(imageURL) {
   }
 }
 
+async function downloadFromS3(res, params) {
+  try {
+    const command = new GetObjectCommand(params);
+    const { Body } = await s3Client.send(command);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${params.Key}"`
+    );
+    res.setHeader("Content-Type", "application/octet-stream");
+    Body.pipe(res); // Streams the file to the response
+  } catch (err) {
+    console.error(err);
+    throw new CustomErr("Cannot download file at this time");
+  }
+}
+
 module.exports = {
   uploadToS3,
   uploadToS3Middleware,
   upload,
   deleteFromS3,
   calculateSHA256,
+  downloadFromS3,
 };

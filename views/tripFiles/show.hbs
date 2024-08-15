@@ -1,5 +1,6 @@
 <h2>{{#if tripFile.title}}{{tripFile.title}} - {{/if}}{{uploadedBy}}</h2>
 <h3>Date: {{convertReadableDate tripFile.userSetDate}}</h3>
+{{> errorMessage}}
 <img
   src="{{tripFile.imageURL}}"
   alt="{{tripFile.title}}"
@@ -12,4 +13,5 @@
   </div>
 {{/if}}
 <a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile">Edit</a>
+<a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/download">Download</a>
 <a href="/tripFolders/{{tripFolder.id}}">Return</a>
