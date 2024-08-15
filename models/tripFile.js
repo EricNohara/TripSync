@@ -16,6 +16,10 @@ const tripFileSchema = mongoose.Schema({
     required: true,
     ref: "User",
   },
+  uploadedByName: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
   },

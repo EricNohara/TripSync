@@ -42,12 +42,6 @@ const hbs = require("express-handlebars").create({
     userHasNewNotifs: (user) => {
       return user.newNotificationCount > 0 ? true : false;
     },
-    shortenWordX: (word, x) => {
-      return word.slice(0, x);
-    },
-    strlen: (str) => {
-      return str.length;
-    },
   },
 });
 
