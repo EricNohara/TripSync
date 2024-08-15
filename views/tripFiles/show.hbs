@@ -1,17 +1,48 @@
-<h2>{{#if tripFile.title}}{{tripFile.title}} - {{/if}}{{uploadedBy}}</h2>
-<h3>Date: {{convertReadableDate tripFile.userSetDate}}</h3>
-{{> errorMessage}}
-<img
-  src="{{tripFile.imageURL}}"
-  alt="{{tripFile.title}}"
-  height="300"
-  width="200"
-/>
-{{#if tripFile.description}}
-  <div>
-    <h3>Description: </h3>{{tripFile.description}}
+<div class="file-show-container">
+  <div class="return-from-file-link">
+    <div class="select-oval">
+      <a href="/tripFolders/{{tripFolder.id}}"><span class="material-symbols-outlined">arrow_back</span>Back</a>
+    </div>
   </div>
-{{/if}}
-<a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile">Edit</a>
-<a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/download">Download</a>
-<a href="/tripFolders/{{tripFolder.id}}">Return</a>
+  <div class="container file-content-container">
+    <div class="input-form-container ellipsis-overflow file-content-inner-container">
+      <h1 class="ellipsis-overflow trip-file-title">{{tripFile.title}}</h1>
+      <div class="file-info-subtitle">
+        <h3 class="uploaded-by"><span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span>{{uploadedBy}}</h3>
+        <h3>{{convertReadableDate tripFile.userSetDate}}</h3>
+      </div>
+      {{> errorMessage}}
+      <div class="image-content">
+        <img
+          src="{{tripFile.imageURL}}"
+          alt="{{tripFile.title}}"
+          height="300"
+          width="200"
+        />
+        <div class="description-background">
+          <h3 class="description-title">Description:</h3>
+          {{#if tripFile.description}}
+            <p class="description">{{tripFile.description}}</p>
+          {{else}}
+            <p class="description">None</p>
+          {{/if}}
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="file-operations">
+    <div class="file-link-buttons">
+      <a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/download">
+        <span class="material-symbols-outlined">download</span>
+        Save
+      </a>
+      <a href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile">
+        <span class="material-symbols-outlined">edit</span>
+        Edit
+      </a>
+    </div>
+  </div>
+</div>
+
+

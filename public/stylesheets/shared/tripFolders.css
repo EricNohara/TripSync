@@ -124,7 +124,7 @@
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-width: 80%;
+  max-width: 100%;
 }
 
 .folder-name {
@@ -346,4 +346,124 @@
 
 .image-icon {
   color: var(--app-warning-color);
+}
+
+.trip-file-title {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  margin-top: 1rem;
+  font-size: 1.5rem;
+}
+
+.file-info-subtitle {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--app-secondary-text-color);
+}
+
+.file-info-subtitle h3 {
+  margin: 0;
+  font-weight: 400 !important;
+}
+
+.uploaded-by {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploaded-by .user-icon {
+  margin: 0;
+  margin-right: 1rem;
+}
+
+.file-show-container {
+  display: grid;
+  grid-template-columns: 175px 750px 175px;
+  justify-content: center;
+  min-width: 1100px;
+  margin: auto;
+  margin-top: 3rem;
+}
+
+.file-content-container {
+  margin-top: 0 !important;
+  background-color: #131314 !important;
+}
+
+.file-content-inner-container {
+  margin-bottom: 2rem;
+  width: 80%;
+}
+
+.return-from-file-link {
+  justify-self: end;
+}
+
+.return-from-file-link .select-oval {
+  margin: 0;
+}
+
+.return-from-file-link a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 1rem;
+}
+
+.file-link-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.file-link-buttons a {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-bottom: 1rem;
+  border-radius: 2rem;
+  background-color: var(--nav-select-background-color);
+  transition: background-color 0.3s ease;
+  padding: 0.25rem 1rem;
+}
+
+.file-link-buttons a:hover {
+  cursor: pointer;
+  background-color: var(--nav-select-hover-background-color);
+}
+
+.image-content {
+  display: grid;
+  grid-template-columns: 60% 40%;
+  margin-top: 2rem;
+}
+
+.image-content img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 1rem;
+}
+
+.description-background {
+  background-color: var(--search-background-color);
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-left: 1rem;
+}
+
+.description-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.description {
+  color: var(--app-secondary-text-color);
+  font-size: 0.8rem;
 }
