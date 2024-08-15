@@ -1,5 +1,9 @@
 <div class="folder-content-container">
-  {{> tripFolderNav}}
+  {{#if tripFolder.isShared}}
+    {{> tripFolderNav folderType="shared"}}
+  {{else}}
+    {{> tripFolderNav folderType="private"}}
+  {{/if}}
   <div class="folder-content-background">
     <div class="folder-content add-user-content">
       <div class="folder-tree ellipsis-overflow">

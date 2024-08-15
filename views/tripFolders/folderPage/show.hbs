@@ -1,5 +1,9 @@
 <div class="folder-content-container">
-  {{> tripFolderNav}}
+  {{#if tripFolder.isShared}}
+    {{> tripFolderNav folderType="shared"}}
+  {{else}}
+    {{> tripFolderNav folderType="private"}}
+  {{/if}}
   <div class="folder-content-background">
     <div class="folder-content">
       <div class="folder-tree ellipsis-overflow">
@@ -14,7 +18,7 @@
       <div class="trip-folder-nav-bar">
           <form id="filter-form" action="/tripFolders/{{tripFolder.id}}" method="GET">
             <select class="select-item" name="sortBy">
-              <option value="">Filter</option>
+              <option value="">Sort</option>
               <option value="setDate" {{#if (equals sortBy "setDate")}}selected{{/if}}>Date</option>
               <option value="uploadDate" {{#if (equals sortBy "uploadDate")}}selected{{/if}}>Upload Date</option>
               <option value="title" {{#if (equals sortBy "title")}}selected{{/if}}>Title</option>
@@ -45,8 +49,11 @@
             </a>
           </div>
           {{#if tripFolder.isShared}}
-            <form action="/tripFolders/{{tripFolder.id}}/removeUser?_method=PUT" method="POST">
-              <button type="submit">Leave</button>
+            <form action="/tripFolders/{{tripFolder.id}}/removeUser?_method=PUT" method="POST" class="delete-form">
+              <button class="folder-form-submit-button delete-button" type="submit">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group_remove</span>
+                Leave
+              </button>
             </form>
           {{else}}
             <form
@@ -81,7 +88,7 @@
               <p class="dimmed">{{convertReadableDate this.userSetDate}}</p>
               <div class="dimmed author-name">
                 <span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-                <div class="ellipsis-overflow">{{this.uploadedByName}}</div>
+                <div class="ellipsis-overflow">{{#if (equals this.uploadedByName ../user.username)}}Me{{else}}{{this.uploadedByName}}{{/if}}</div>
               </div>
             </li>
           </a>
