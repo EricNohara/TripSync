@@ -7,6 +7,12 @@
     </div>
   </a>
   <div class="folder-links">
+    <a href="/tripFolders">
+      <div class="folder {{#if (equals folderType "home")}}selected{{/if}}">
+        <span class="material-symbols-outlined folder-icon" {{#if (equals folderType "home")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>home</span>
+        Home      
+      </div>
+    </a>
     <a href="/tripFolders/private">
       <div class="folder {{#if (equals folderType "private")}}selected{{/if}}">
         <span class="material-symbols-outlined folder-icon" {{#if (equals folderType "private")}}style="font-variation-settings: 'FILL' 1;"{{/if}}>

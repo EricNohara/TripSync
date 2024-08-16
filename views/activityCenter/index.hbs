@@ -23,7 +23,7 @@
                 action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/declineIncomingRequest?_method=PUT"
                 method="POST"
               >
-                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
               </form>
             </div>
           {{/each}}
@@ -48,7 +48,7 @@
                 action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/cancelOutgoingRequest?_method=PUT"
                 method="POST"
               >
-                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
               </form>
             </div>
           {{/each}}
@@ -70,7 +70,7 @@
                 action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"
                 method="POST"
               >
-                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
               </form>
             </div>
           {{/each}}

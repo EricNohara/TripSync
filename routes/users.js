@@ -22,18 +22,7 @@ const sendPasswordResetEmail = require("../public/javascripts/sendEmail");
 
 // Home Page to Search for Users
 router.get("/", verifyToken, async (req, res) => {
-  try {
-    const user = await retrieveUser(req, res);
-    const users = await getSearchableUsers(req);
-    res.render("users/index", {
-      users: users,
-      user: user,
-      searchOptions: req.query,
-      selectedNav: "users",
-    });
-  } catch (err) {
-    res.redirect("/");
-  }
+  res.redirect("/");
 });
 
 // Forgot Password Route

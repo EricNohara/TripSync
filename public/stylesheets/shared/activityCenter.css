@@ -2,10 +2,8 @@
   display: grid;
   grid-template-columns: 50% 50%;
   margin: auto;
-  /* background-color: var(--app-dark-background); */
   height: 550px;
   width: 1200px;
-  margin-top: 1rem;
   border-radius: 1rem;
 }
 
@@ -97,19 +95,24 @@
 }
 
 .cancel-request-button {
+  background-color: var(--app-second-warning-color);
   border: none;
   border-radius: 2rem;
   color: white !important;
+  transition: background-color 0.3s ease;
+  padding: 0.15rem;
   transition: background-color 0.3s ease;
 }
 
 .cancel-request-button:hover {
   cursor: pointer;
+  background-color: var(--app-warning-color);
 }
 
 .accept-button {
   background-color: var(--app-success-second-color);
   color: white;
+  padding: 0.15rem;
   border: none;
   border-radius: 2rem;
   transition: background-color 0.3s ease;
