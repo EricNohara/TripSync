@@ -6,9 +6,9 @@
         {{#if errorMessage}}
           {{> errorMessage}}
         {{else}}
-          <form class="search-form folder-search-form" action="/tripFolders/shared" method="GET">
+          <form autocomplete="off" class="search-form folder-search-form" action="/tripFolders/shared" method="GET">
             <div class="search-form-background">
-              <input class="search-folder" type="text" name="folderName" value="{{searchOptions.folderName}}" placeholder="Search folder name" />
+              <input class="search-input" type="text" name="folderName" value="{{searchOptions.folderName}}" placeholder="Search folder name" />
               <button class="search-submit" type="submit">
                 <span class="material-symbols-outlined search-symbol">search</span>
               </button>

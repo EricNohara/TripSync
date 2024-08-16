@@ -333,12 +333,24 @@ router.delete("/delete", verifyToken, async (req, res) => {
       const index = folder.users.indexOf(user.id);
       if (index > -1) folder.users.splice(index, 1);
 
-      // send notification to remaining user
-      for (const remainingUserID of folder.users) {
-        const remainingUser = await User.findById(remainingUserID);
-        remainingUser.notifications.push(notification);
-        remainingUser.newNotificationCount += 1;
-        await remainingUser.save();
+      if (folder.users.length === 1) {
+        folder.isShared = false;
+        const remUser = await User.findById(folder.users[0]);
+        remUser.privateFolders.push(folder.id);
+        const indexOfFolder = remUser.sharedFolders.indexOf(folder.id);
+        if (indexOfFolder > -1) remUser.sharedFolders.splice(indexOfFolder, 1);
+        else throw new CustomErr("Error removing folder from user data");
+        remUser.notifications.push(notification);
+        remUser.newNotificationCount += 1;
+        await remUser.save();
+      } else {
+        // send notification to remaining users
+        for (const remainingUserID of folder.users) {
+          const remainingUser = await User.findById(remainingUserID);
+          remainingUser.notifications.push(notification);
+          remainingUser.newNotificationCount += 1;
+          await remainingUser.save();
+        }
       }
 
       // Delete all pending requests made by user

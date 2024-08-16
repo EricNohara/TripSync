@@ -186,6 +186,8 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
       user: user.id,
       tripFolder: tripFolder.id,
       notifType: "incomingRequest",
+      fallbackUsername: user.username,
+      fallbackFolderName: tripFolder.folderName,
     };
     const requestExists = requestedUser.incomingRequests.some(
       (incomingRequest) =>
@@ -246,6 +248,8 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
         user: user.id,
         tripFolder: tripFolder.id,
         notifType: "removeUser",
+        fallbackUsername: user.username,
+        fallbackFolderName: tripFolder.folderName,
       };
 
       folderUser.notifications.push(notification);
@@ -540,6 +544,7 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
 
 async function loadSearchableFolders(req, res, user = null, folderType) {
   let searchOptions = {};
+  let folderIDs;
   if (req.query.folderName != null && req.query.folderName !== "")
     searchOptions.folderName = new RegExp(req.query.folderName, "i");
 

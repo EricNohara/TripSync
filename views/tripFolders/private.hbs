@@ -4,12 +4,12 @@
       <div class="folder-content">
         <h1 class="trip-folder-page-title">Private Folders</h1>
         <form autocomplete="off" class="search-form folder-search-form" action="/tripFolders/private" method="GET">
-        <div class="search-form-background">
-          <input class="search-input" type="text" name="folderName" value="{{searchOptions.folderName}}" placeholder="Search folder name" />
-          <button class="search-submit" type="submit">
-            <span class="material-symbols-outlined search-symbol">search</span>
-          </button>
-        </div>
+          <div class="search-form-background">
+            <input class="search-input" type="text" name="folderName" value="{{searchOptions.folderName}}" placeholder="Search folder name" />
+            <button class="search-submit" type="submit">
+              <span class="material-symbols-outlined search-symbol">search</span>
+            </button>
+          </div>
         </form>
         {{> folderPageHeader}}
         <ul class="folders-list">

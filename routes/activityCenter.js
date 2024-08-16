@@ -139,6 +139,8 @@ router.put(
         user: user.id,
         tripFolder: tripFolder.id,
         notifType: "acceptIncomingRequest",
+        fallbackUsername: user.username,
+        fallbackFolderName: tripFolder.folderName,
       };
       sentByUser.notifications.push(responseNotification);
       sentByUser.newNotificationCount += 1;
@@ -170,6 +172,8 @@ router.put(
         user: user.id,
         tripFolder: tripFolder.id,
         notifType: "declineIncomingRequest",
+        fallbackUsername: user.username,
+        fallbackFolderName: tripFolder.folderName,
       };
       sentByUser.notifications.push(responseNotification);
       sentByUser.newNotificationCount += 1;

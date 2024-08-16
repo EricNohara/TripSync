@@ -155,13 +155,11 @@
 }
 
 .folder-list-icon {
-  margin-left: 0.5rem;
   margin-right: 1rem;
   color: var(--app-secondary-text-color);
 }
 
 .user-icon {
-  margin-left: 1rem;
   margin-right: 1rem;
 }
 
