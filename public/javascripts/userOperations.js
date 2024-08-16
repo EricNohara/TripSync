@@ -1,6 +1,7 @@
 const User = require("../../models/user");
 const jwt = require("jsonwebtoken");
 const errorContent = "Please Sign In";
+const maxLen = 20;
 
 // Middleware for JWT validation
 function verifyToken(req, res, next) {
@@ -70,9 +71,19 @@ async function getSearchableUsers(req) {
   }
 }
 
+function shortenWordEllipsis(word, length) {
+  if (word.length > length) {
+    const newWord = word.slice(0, length);
+    return `${newWord}...`;
+  } else {
+    return word;
+  }
+}
+
 module.exports = {
   verifyToken,
   retrieveUser,
   getSearchableUsers,
   isAlphaNumeric,
+  shortenWordEllipsis,
 };

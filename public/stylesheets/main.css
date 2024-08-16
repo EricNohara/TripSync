@@ -3,6 +3,7 @@
 @import "shared/formInputs.css";
 @import "shared/statusMessages.css";
 @import "shared/tripFolders.css";
+@import "shared/activityCenter.css";
 
 :root {
   font-family: var(--app-font-family);

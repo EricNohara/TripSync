@@ -311,7 +311,14 @@ router.delete("/delete", verifyToken, async (req, res) => {
     // Delete user from all folders and remove all files user uploaded to those folders
     const userFolders = await TripFolder.find({ users: user.id });
     for (const folder of userFolders) {
-      const notification = `${user.username} left shared folder: ${folder.folderName}`;
+      const notification = {
+        user: user.id,
+        tripFolder: folder.id,
+        notifType: "removeUser",
+        fallbackUsername: user.username,
+        fallbackFolderName: folder.folderName,
+      };
+
       const userFilesInFolder = await TripFile.find({
         _id: { $in: folder.tripFiles },
         uploadedBy: user.id,

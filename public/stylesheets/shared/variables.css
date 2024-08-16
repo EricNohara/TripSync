@@ -13,7 +13,9 @@
   --app-third-warning-color: #f9cbc7;
   --app-fourth-warning-color: #ed6054;
   --app-success-color: #81c995;
+  --app-success-second-color: #38ad59;
   --search-background-color: #282a2c;
   --neutral-button-color: rgb(79, 79, 79);
   --neutral-button-hover-color: rgb(105, 105, 105);
+  --app-dark-background: #131314;
 }

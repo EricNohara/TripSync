@@ -1,7 +1,7 @@
 <form class="login-form" action="{{formAction}}" method="POST">
   {{#if (isRegisterForm loginOrRegister)}}
     <div>
-      <input type="text" name="username" {{#if user}}value="{{user.username}}"{{/if}} placeholder="Username" required maxlength="36" />
+      <input type="text" name="username" {{#if user}}value="{{user.username}}"{{/if}} placeholder="Username" required  />
     </div>
   {{/if}}
   <div class="text-input">
@@ -40,7 +40,7 @@
         <input type="radio" name="isPrivate" value="true" {{#if user}}{{#if user.isPrivate}}checked{{/if}}{{/if}} />Private
       </div>
       <div class="radio-container">
-        <input type="radio" name="isPrivate" value="false" {{#if user}}{{#unless user.isPrivate}}checked{{/unless}}{{/if}} />Public
+        <input type="radio" name="isPrivate" value="false" {{#if user}}{{#unless user.isPrivate}}checked{{/unless}}{{else}}checked{{/if}} />Public
       </div>
     </div>
   {{/if}}

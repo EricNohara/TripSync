@@ -1,48 +1,83 @@
-{{> errorMessage}}
-<div>
-  <h3>Incoming Requests</h3>
-  {{#each incomingRequests}}
-    {{this.user.username}}
-    invites you to join
-    {{this.tripFolder.folderName}}
-    <form
-      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/acceptIncomingRequest?_method=PUT"
-      method="POST"
-    >
-      <button type="submit">Accept</button>
-    </form>
-    <form
-      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/declineIncomingRequest?_method=PUT"
-      method="POST"
-    >
-      <button type="submit">Decline</button>
-    </form>
-  {{/each}}
-</div>
-<div>
-  <h3>Outgoing Requests</h3>
-  {{#each outgoingRequests}}
-    Requested
-    {{this.user.username}}
-    to join
-    {{this.tripFolder.folderName}}
-    <form
-      action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/cancelOutgoingRequest?_method=PUT"
-      method="POST"
-    >
-      <button type="submit">Cancel</button>
-    </form>
-  {{/each}}
-</div>
-<div>
-  <h3>Notifications</h3>
-  {{#each formattedNotifications}}
-    {{this}}
-    <form
-      action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"
-      method="POST"
-    >
-      <button type="submit">Delete</button>
-    </form>
-  {{/each}}
+<div class="activity-center-background">
+  {{> errorMessage}}
+  <div class="request-content">
+    <div class="requests">
+      <h3 class="activity-title">Incoming Requests</h3>
+      {{#if (greater (arrayLength incomingRequests) 0)}}
+        <div class="incoming-request-header request-header">
+          <p><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>Sent to</p>
+          <p><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>Folder</p>
+        </div>
+        <div class="request-list">
+          {{#each incomingRequests}}
+            <div class="request-list-item incoming-request-list-item">
+              <div class="ellipsis-overflow request-list-item-content">{{this.user.username}}</div> 
+              <div class="ellipsis-overflow request-list-item-content">{{this.tripFolder.folderName}}</div>
+              <form
+                action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/acceptIncomingRequest?_method=PUT"
+                method="POST"
+              >
+                <button class="accept-button" type="submit"><span class="material-symbols-outlined request-list-icon">check</span></button>
+              </form>
+              <form
+                action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/declineIncomingRequest?_method=PUT"
+                method="POST"
+              >
+                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+              </form>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="dimmed">No incoming requests...</p>
+      {{/if}}
+    </div>
+    <div class="requests">
+      <h3 class="activity-title">Outgoing Requests</h3>
+      {{#if (greater (arrayLength outgoingRequests) 0)}}
+        <div class="request-header">
+          <p><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>Sent to</p>
+          <p><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">folder</span>Folder</p>
+        </div>
+        <div class="request-list">
+          {{#each outgoingRequests}}
+            <div class="request-list-item">
+              <div class="ellipsis-overflow request-list-item-content">{{this.user.username}}</div> 
+              <div class="ellipsis-overflow request-list-item-content">{{this.tripFolder.folderName}}</div>
+              <form
+                action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/cancelOutgoingRequest?_method=PUT"
+                method="POST"
+              >
+                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+              </form>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="dimmed">No outgoing requests...</p>
+      {{/if}}
+    </div>
+  </div>
+  <div class="notification-content">
+    <div class="notification-background">
+      <h3 class="activity-title">Notifications</h3>
+      {{#if (greater (arrayLength formattedNotifications) 0)}}
+        <div class="activity-list-background">
+          {{#each formattedNotifications}}
+            <div class="notification-item-content">
+              {{this}}
+              <form
+                action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"
+                method="POST"
+              >
+                <button class="delete-button cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+              </form>
+            </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <p class="dimmed">No new notifications...</p>
+      {{/if}}
+    </div>
+  </div>
 </div>

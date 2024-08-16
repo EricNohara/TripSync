@@ -6,6 +6,7 @@ const TripFolder = require("../models/tripFolder");
 const {
   verifyToken,
   retrieveUser,
+  shortenWordEllipsis,
 } = require("../public/javascripts/userOperations");
 
 const {
@@ -13,6 +14,8 @@ const {
   setWildcardError,
   queryAppendError,
 } = require("../public/javascripts/customErrors");
+
+const maxLen = 15;
 
 // Display Activity Center Page
 router.get("/", verifyToken, async (req, res) => {
@@ -49,16 +52,22 @@ router.get("/", verifyToken, async (req, res) => {
           const notifUser = await User.findById(notif.user);
           const notifTripFolder = await TripFolder.findById(notif.tripFolder);
           const notifType = notif.notifType;
+          const shortUsername = notifUser
+            ? shortenWordEllipsis(notifUser.username, maxLen)
+            : shortenWordEllipsis(notif.fallbackUsername, maxLen);
+          const shortFoldername = notifTripFolder
+            ? shortenWordEllipsis(notifTripFolder.folderName, maxLen)
+            : shortenWordEllipsis(notif.fallbackFolderName, maxLen);
 
           switch (notifType) {
             case "incomingRequest":
-              return `${notifUser.username} has invited you to join a folder named: ${notifTripFolder.folderName}`;
+              return `${shortUsername} invited you to join: ${shortFoldername}`;
             case "removeUser":
-              return `${notifUser.username} left shared folder: ${notifTripFolder.folderName}`;
+              return `${shortUsername} left shared folder: ${shortFoldername}`;
             case "acceptIncomingRequest":
-              return `${notifUser.username} has joined ${notifTripFolder.folderName}`;
+              return `${shortUsername} has joined ${shortFoldername}`;
             case "declineIncomingRequest":
-              return `${notifUser.username} declined to join ${notifTripFolder.folderName}`;
+              return `${shortUsername} declined to join ${shortFoldername}`;
             default:
               throw new CustomErr("Error: invalid notification type detected");
           }

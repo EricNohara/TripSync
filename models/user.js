@@ -71,6 +71,8 @@ const userSchema = new mongoose.Schema({
           type: String,
           required: true,
         },
+        fallbackUsername: { type: String, required: false },
+        fallbackFolderName: { type: String, require: false },
       },
     ],
     required: true,

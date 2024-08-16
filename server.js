@@ -42,6 +42,9 @@ const hbs = require("express-handlebars").create({
     userHasNewNotifs: (user) => {
       return user.newNotificationCount > 0 ? true : false;
     },
+    arrayLength: (arr) => {
+      return arr.length;
+    },
   },
 });
 
@@ -75,13 +78,13 @@ const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const tripFoldersRouter = require("./routes/tripFolders");
 const activityCenterRouter = require("./routes/activityCenter");
-// const tempDevRouter = require("./routes/tempDev");
+const tempDevRouter = require("./routes/tempDev");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/tripFolders", tripFoldersRouter);
 app.use("/activityCenter", activityCenterRouter);
-// app.use("/tempDev", tempDevRouter);
+app.use("/tempDev", tempDevRouter);
 
 app.listen(app.get("port"), () => {
   console.log("Server started at http://localhost:" + app.get("port"));

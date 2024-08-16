@@ -59,7 +59,7 @@
 
 .folder-content-background {
   width: 100%;
-  background-color: #131314;
+  background-color: var(--app-dark-background);
   border-radius: 1rem;
   margin-right: 1rem;
   overflow: hidden;
@@ -390,7 +390,7 @@
 
 .file-content-container {
   margin-top: 0 !important;
-  background-color: #131314 !important;
+  background-color: var(--app-dark-background) !important;
 }
 
 .file-content-inner-container {
