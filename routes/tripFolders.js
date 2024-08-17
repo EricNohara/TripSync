@@ -211,7 +211,8 @@ router.put("/:tripID/addUser", verifyToken, async (req, res) => {
     await tripFolder.save();
     await user.save();
     await requestedUser.save();
-    const successMessage = `Successfully invited ${requestedUser.username} to join ${tripFolder.folderName}`;
+    const successMessage =
+      "Successfully invited selected user to join current folder";
     res.redirect(
       `/tripFolders/${tripFolder.id}/addUser?successMessage=${successMessage}`
     );

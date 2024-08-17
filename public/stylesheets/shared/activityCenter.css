@@ -30,13 +30,16 @@
   background-color: var(--app-secondary-background-color);
   padding: 1rem;
   border-radius: 1rem;
-  overflow: hidden;
-  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
 }
 
 .request-list {
   display: grid;
   align-items: center;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding-right: 1rem;
 }
 
 .request-list-item {
@@ -68,6 +71,7 @@
   display: grid;
   grid-template-columns: 46% 46%;
   border-bottom: 1px solid var(--app-secondary-text-color);
+  margin-right: 1.6rem;
 }
 
 .incoming-request-header {
@@ -122,20 +126,26 @@
 .notification-background {
   background-color: var(--app-secondary-background-color);
   height: 536px;
-  overflow: hidden;
-  overflow-y: scroll;
   padding: 1rem;
   border-radius: 1rem;
   font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
 }
 
-.requests::-webkit-scrollbar,
-.notification-background::-webkit-scrollbar {
+.activity-list-background {
+  overflow: hidden;
+  overflow-y: scroll;
+  padding-right: 1rem;
+}
+
+.request-list::-webkit-scrollbar,
+.activity-list-background::-webkit-scrollbar {
   width: 12px;
 }
 
-.requests::-webkit-scrollbar-thumb,
-.notification-background::-webkit-scrollbar-thumb {
+.request-list::-webkit-scrollbar-thumb,
+.activity-list-background::-webkit-scrollbar-thumb {
   background-color: #4c4e51;
   border-radius: 2rem;
 }
