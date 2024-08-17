@@ -9,6 +9,7 @@ const {
   verifyToken,
   retrieveUser,
   getSearchableUsers,
+  shortenWordEllipsis,
 } = require("../public/javascripts/userOperations");
 
 const {
@@ -98,7 +99,8 @@ router.get("/:tripID", verifyToken, async (req, res) => {
       tripFolder.users.map(async (userID) => {
         try {
           const user = await User.findById(userID);
-          return user.username;
+          const shortenedUsername = shortenWordEllipsis(user.username, 20);
+          return shortenedUsername;
         } catch {
           return "";
         }
@@ -551,7 +553,6 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
             const folder = await TripFolder.findById(folderID);
             return folder;
           } catch (err) {
-            console.error(err);
             return null;
           }
         })
