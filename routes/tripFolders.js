@@ -110,6 +110,10 @@ router.get("/:tripID", verifyToken, async (req, res) => {
         try {
           const curTripFile = await TripFile.findById(tripFileID);
           const uploadedBy = await User.findById(curTripFile.uploadedBy);
+          if (uploadedBy.username !== curTripFile.uploadedByName) {
+            curTripFile.uploadedByName = uploadedBy.username;
+            await curTripFile.save();
+          }
           if (!curTripFile || !uploadedBy) return null;
           if (filterUser && filterUser !== uploadedBy.username) return null;
           return curTripFile;
@@ -374,7 +378,6 @@ router.post(
         description: req.body.description,
         userSetDate: req.body.userSetDate,
         uploadedBy: user.id,
-        uploadedByName: user.username,
         imageURL: req.file.location,
         imageHash: req.file.hash,
       });
@@ -574,6 +577,7 @@ async function loadSearchableFolders(req, res, user = null, folderType) {
       _id: { $in: folderIDs },
       ...searchOptions,
     });
+
     res.render(`tripFolders/${folderType}`, {
       tripFolders: tripFolders,
       user: user,
