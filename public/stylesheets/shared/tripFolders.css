@@ -484,3 +484,7 @@
   background-color: var(--app-secondary-text-color);
   border-radius: 2rem;
 }
+
+.file-author-name {
+  width: 8rem;
+}

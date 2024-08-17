@@ -88,7 +88,7 @@
               <p class="dimmed">{{convertReadableDate this.userSetDate}}</p>
               <div class="dimmed author-name">
                 <span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span>
-                <div class="ellipsis-overflow">{{#if (equals this.uploadedByName ../user.username)}}Me{{else}}{{this.uploadedByName}}{{/if}}</div>
+                <div class="ellipsis-overflow">{{#if (equals this.uploadedByName ../user.username)}}Me{{else}} <div class="file-author-name ellipsis-overflow">{{this.uploadedByName}}</div> {{/if}}</div>
               </div>
             </li>
           </a>
