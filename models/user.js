@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: [],
   },
+  recentFolders: {
+    type: Array,
+    required: true,
+    default: [],
+  },
   incomingRequests: {
     type: [
       {

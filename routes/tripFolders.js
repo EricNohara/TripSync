@@ -125,6 +125,15 @@ router.get("/:tripID", verifyToken, async (req, res) => {
     tripFiles = tripFiles.filter((tripFile) => tripFile != null);
     sortTripFiles(tripFiles, sortBy);
 
+    const indexFolder = user.recentFolders.indexOf(tripFolder.id);
+    if (indexFolder > -1) {
+      user.recentFolders.splice(indexFolder, 1);
+    }
+
+    user.recentFolders.push(tripFolder.id);
+    if (user.recentFolders.length > 10) user.recentFolders.splice(0, 1);
+    await user.save();
+
     res.render("tripFolders/folderPage/show", {
       tripFolder: tripFolder,
       usernames: usernames,
@@ -265,7 +274,6 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     await user.save();
     res.redirect("/tripFolders");
   } catch (err) {
-    console.log(err);
     err = setWildcardError(err, "Error removing user from trip folder");
     res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
   }
@@ -535,11 +543,28 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
   const errorMessage = req.query.errorMessage ? req.query.errorMessage : null;
   try {
     const user = await retrieveUser(req, res);
+    let recentFolders = null;
+    if (route === "index") {
+      recentFolders = await Promise.all(
+        user.recentFolders.map(async (folderID) => {
+          try {
+            const folder = await TripFolder.findById(folderID);
+            return folder;
+          } catch (err) {
+            console.error(err);
+            return null;
+          }
+        })
+      );
+
+      recentFolders.reverse();
+    }
     res.render(`tripFolders/${route}`, {
       user: user,
       tripFolders: tripFolders,
       errorMessage: errorMessage,
       selectedNav: "tripFolders",
+      recentFolders: recentFolders,
     });
   } catch (err) {
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);

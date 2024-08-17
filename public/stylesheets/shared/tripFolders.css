@@ -62,19 +62,8 @@
   background-color: var(--app-dark-background);
   border-radius: 1rem;
   margin-right: 1rem;
-  overflow: hidden;
-  overflow-y: scroll;
   height: 100%;
   font-size: 1.7rem;
-}
-
-.folder-content-background::-webkit-scrollbar {
-  width: 12px;
-}
-
-.folder-content-background::-webkit-scrollbar-thumb {
-  background-color: #4c4e51;
-  border-radius: 2rem;
 }
 
 .trip-folder-page-title {
@@ -110,6 +99,19 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow: hidden;
+  overflow-y: scroll;
+  height: 18rem;
+  padding-right: 12px;
+}
+
+.folders-list::-webkit-scrollbar {
+  width: 12px;
+}
+
+.folders-list::-webkit-scrollbar-thumb {
+  background-color: var(--app-secondary-text-color);
+  border-radius: 2rem;
 }
 
 .folder-list-item {
@@ -487,4 +489,11 @@
 
 .file-author-name {
   width: 8rem;
+}
+
+.trip-folder-page-subtitle {
+  font-weight: 400;
+  margin: 0;
+  font-size: 1.15rem;
+  margin-bottom: 0.5rem;
 }
