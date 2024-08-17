@@ -4,6 +4,7 @@
 @import "shared/statusMessages.css";
 @import "shared/tripFolders.css";
 @import "shared/activityCenter.css";
+@import "shared/home.css";
 
 :root {
   font-family: var(--app-font-family);

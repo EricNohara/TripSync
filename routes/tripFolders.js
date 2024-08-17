@@ -236,7 +236,6 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
       const remainingUser = await User.findById(tripFolder.users[0]);
       const indexOfFolder = remainingUser.sharedFolders.indexOf(tripFolder.id);
       if (indexOfFolder > -1) remainingUser.sharedFolders.splice(indexOfFolder);
-      else throw new CustomErr("Error updating remaining user info");
       remainingUser.privateFolders.push(tripFolder.id);
       await remainingUser.save();
     }
@@ -261,6 +260,7 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
     await user.save();
     res.redirect("/tripFolders");
   } catch (err) {
+    console.log(err);
     err = setWildcardError(err, "Error removing user from trip folder");
     res.redirect(queryAppendError(`/tripFolders/${req.params.tripID}`, err));
   }

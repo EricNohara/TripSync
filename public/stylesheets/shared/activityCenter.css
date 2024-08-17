@@ -3,8 +3,8 @@
   grid-template-columns: 50% 50%;
   margin: auto;
   height: 550px;
-  width: 1200px;
   border-radius: 1rem;
+  min-width: 1000px;
 }
 
 .activity-title {
@@ -27,20 +27,11 @@
 }
 
 .requests {
-  background-color: var(--search-background-color);
+  background-color: var(--app-secondary-background-color);
   padding: 1rem;
   border-radius: 1rem;
   overflow: hidden;
   overflow-y: scroll;
-}
-
-.requests::-webkit-scrollbar {
-  width: 12px;
-}
-
-.requests::-webkit-scrollbar-thumb {
-  background-color: #4c4e51;
-  border-radius: 2rem;
 }
 
 .request-list {
@@ -53,6 +44,11 @@
   grid-template-columns: 46% 46% 8%;
   border-bottom: 1px solid var(--app-secondary-text-color);
   align-items: center;
+  padding: 0.25rem;
+}
+
+.request-list-item:hover {
+  background-color: var(--neutral-button-color);
 }
 
 .incoming-request-list-item {
@@ -124,11 +120,24 @@
 }
 
 .notification-background {
-  background-color: var(--search-background-color);
-  height: calc(100%);
+  background-color: var(--app-secondary-background-color);
+  height: 536px;
+  overflow: hidden;
+  overflow-y: scroll;
   padding: 1rem;
   border-radius: 1rem;
   font-size: 0.9rem;
+}
+
+.requests::-webkit-scrollbar,
+.notification-background::-webkit-scrollbar {
+  width: 12px;
+}
+
+.requests::-webkit-scrollbar-thumb,
+.notification-background::-webkit-scrollbar-thumb {
+  background-color: #4c4e51;
+  border-radius: 2rem;
 }
 
 .notification-item-content:first-of-type {
@@ -142,7 +151,11 @@
   justify-content: space-between;
   font-size: 0.9rem;
   border-bottom: 1px solid var(--app-secondary-text-color);
-  padding: 0.25rem;
+  padding: 0.5rem;
+}
+
+.notification-item-content:hover {
+  background-color: var(--neutral-button-color);
 }
 
 .notification-item-content form {

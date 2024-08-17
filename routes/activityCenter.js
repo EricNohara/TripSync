@@ -15,7 +15,7 @@ const {
   queryAppendError,
 } = require("../public/javascripts/customErrors");
 
-const maxLen = 15;
+const maxLen = 16;
 
 // Display Activity Center Page
 router.get("/", verifyToken, async (req, res) => {
@@ -83,8 +83,8 @@ router.get("/", verifyToken, async (req, res) => {
 
     res.render("activityCenter/index", {
       user: user,
-      incomingRequests: incomingRequests,
-      outgoingRequests: outgoingRequests,
+      incomingRequests: incomingRequests.reverse(),
+      outgoingRequests: outgoingRequests.reverse(),
       formattedNotifications: formattedNotifications.reverse(),
       errorMessage: errorMessage,
       selectedNav: "activityCenter",
