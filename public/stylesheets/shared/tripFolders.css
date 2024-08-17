@@ -371,6 +371,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 22rem;
 }
 
 .uploaded-by .user-icon {
@@ -380,7 +381,8 @@
 
 .file-show-container {
   display: grid;
-  grid-template-columns: 175px 750px 175px;
+  grid-template-columns: 140px 780px 140px;
+  column-gap: 20px;
   justify-content: center;
   min-width: 1100px;
   margin: auto;
@@ -390,11 +392,12 @@
 .file-content-container {
   margin-top: 0 !important;
   background-color: var(--app-dark-background) !important;
+  width: 100% !important;
 }
 
 .file-content-inner-container {
   margin-bottom: 2rem;
-  width: 80%;
+  width: 90%;
 }
 
 .return-from-file-link {
@@ -465,4 +468,19 @@
 .description {
   color: var(--app-secondary-text-color);
   font-size: 0.8rem;
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure long words wrap */
+  max-height: 10rem;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding-right: 0.5rem;
+}
+
+.description::-webkit-scrollbar {
+  width: 12px;
+}
+
+.description::-webkit-scrollbar-thumb {
+  background-color: var(--app-secondary-text-color);
+  border-radius: 2rem;
 }

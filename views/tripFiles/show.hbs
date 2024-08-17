@@ -8,7 +8,7 @@
     <div class="input-form-container ellipsis-overflow file-content-inner-container">
       <h1 class="ellipsis-overflow trip-file-title">{{tripFile.title}}</h1>
       <div class="file-info-subtitle">
-        <h3 class="uploaded-by"><span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span>{{uploadedBy}}</h3>
+        <h3 class="uploaded-by ellipsis-overflow"><span class="material-symbols-outlined user-icon" style="font-variation-settings: 'FILL' 1;">account_circle</span><div class="ellipsis-overflow">{{uploadedBy}}</div></h3>
         <h3>{{convertReadableDate tripFile.userSetDate}}</h3>
       </div>
       {{> errorMessage}}
