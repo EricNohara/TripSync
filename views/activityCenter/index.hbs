@@ -60,7 +60,10 @@
   </div>
   <div class="notification-content">
     <div class="notification-background">
-      <h3 class="activity-title">Notifications</h3>
+      <div class="notification-title">
+        <h3 class="activity-title">Notifications</h3>
+        <a class="delete-all-link" href="/activityCenter/deleteAllNotifications">Delete All</a>
+      </div>
       {{#if (greater (arrayLength formattedNotifications) 0)}}
         <div class="activity-list-background">
           {{#each formattedNotifications}}

@@ -112,6 +112,19 @@ router.put("/deleteNotification", verifyToken, async (req, res) => {
   }
 });
 
+// Delete ALL Notifications
+router.get("/deleteAllNotifications", verifyToken, async (req, res) => {
+  try {
+    const user = await retrieveUser(req, res);
+    user.notifications = [];
+    await user.save();
+    res.redirect("/activityCenter");
+  } catch (err) {
+    err = setWildcardError(err, "Error deleting all notifications");
+    res.redirect(queryAppendError("/activityCenter", err));
+  }
+});
+
 // Accept Incoming Request
 router.put(
   "/:tripID/:userID/acceptIncomingRequest",

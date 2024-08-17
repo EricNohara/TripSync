@@ -171,3 +171,15 @@
 .notification-item-content form {
   margin: 0;
 }
+
+.notification-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.delete-all-link {
+  text-decoration: none;
+  margin-right: 1rem;
+  color: var(--app-warning-color);
+}
