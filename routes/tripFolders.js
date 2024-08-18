@@ -33,7 +33,8 @@ const tripFile = require("../models/tripFile");
 router.get("/", verifyToken, async (req, res) => {
   try {
     await retrieveUserAndRedirect(req, res, "index");
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.redirect("/");
   }
 });
@@ -571,6 +572,7 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
       recentFolders: recentFolders,
     });
   } catch (err) {
+    console.error(err);
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 }
