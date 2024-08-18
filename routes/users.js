@@ -224,6 +224,7 @@ router.get("/settings", verifyToken, async (req, res) => {
   }
 });
 
+// Route to edit User information
 router.put("/settings", verifyToken, async (req, res) => {
   try {
     const formAction = req.body.action;
