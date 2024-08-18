@@ -390,6 +390,7 @@ router.post(
         description: req.body.description,
         userSetDate: req.body.userSetDate,
         uploadedBy: user.id,
+        uploadedByName: user.username,
         imageURL: req.file.location,
         imageHash: req.file.hash,
       });
