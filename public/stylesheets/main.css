@@ -40,3 +40,28 @@ a {
   text-decoration: none;
   color: var(--app-text-color);
 }
+
+.hidden {
+  display: none !important;
+}
+
+.skinny {
+  padding: 0.25rem 1rem !important;
+}
+
+.round {
+  padding: 0 !important;
+}
+
+.dummy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  filter: brightness(85%);
+}
+
+.dummy-button:hover {
+  cursor: wait;
+  filter: brightness(85%);
+}

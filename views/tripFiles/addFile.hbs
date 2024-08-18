@@ -5,7 +5,7 @@
       action="/tripFolders/{{tripFolder.id}}/addFile"
       enctype="multipart/form-data"
       method="POST"
-      class="login-form"
+      class="login-form submit-once-form"
     >
       <input
         type="text"
@@ -24,7 +24,11 @@
         id="file-upload-input"
         required
       />
-      <button class="form-submit-button" type="submit">Add</button>
+      <button
+        class="form-submit-button submit-once-button"
+        type="submit"
+      >Add</button>
+      <div class="form-submit-button dummy-button hidden">Pending...</div>
     </form>
     <div class="form-message">
       <a class="form-link" href="/tripFolders/{{tripFolder.id}}">Return</a>

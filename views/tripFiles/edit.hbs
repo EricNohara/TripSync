@@ -6,7 +6,7 @@
       action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=PUT"
       method="POST"
       enctype="multipart/form-data"
-      class="login-form edit-file-form"
+      class="login-form edit-file-form submit-once-form"
     >
       <input id="title-edit-input" type="text" name="title" value="{{tripFile.title}}" placeholder="File name" required />
       <input
@@ -17,14 +17,16 @@
       />
       <textarea name="description" placeholder="Description">{{tripFile.description}}</textarea>
       <input class="file-input" id="file-edit-upload-input" type="file" name="image" accept="image/*"/>
-      <button class="form-submit-button" type="submit">Update</button>
+      <button class="form-submit-button submit-once-button" type="submit">Update</button>
+      <div class="dummy-button hidden form-submit-button">Pending...</div>
     </form>
     <form
       action="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}/editFile?_method=DELETE"
       method="POST"
-      class="login-form delete-button-form"
+      class="login-form delete-button-form submit-once-form"
     >
-        <button class="form-submit-button delete-button" type="submit">Delete</button>
+        <button class="form-submit-button delete-button submit-once-button" type="submit">Delete</button>
+        <div class="dummy-button hidden form-submit-button delete-button">Pending...</div>
     </form>
     <div class="form-message">
       <a class="form-link" href="/tripFolders/{{tripFolder.id}}/{{tripFile.id}}">Return</a>

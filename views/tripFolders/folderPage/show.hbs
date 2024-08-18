@@ -49,22 +49,24 @@
             </a>
           </div>
           {{#if tripFolder.isShared}}
-            <form action="/tripFolders/{{tripFolder.id}}/removeUser?_method=PUT" method="POST" class="delete-form">
-              <button class="folder-form-submit-button delete-button" type="submit">
+            <form action="/tripFolders/{{tripFolder.id}}/removeUser?_method=PUT" method="POST" class="delete-form submit-once-form">
+              <button class="folder-form-submit-button delete-button submit-once-button" type="submit">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">group_remove</span>
                 Leave
               </button>
+              <div class="dummy-button hidden folder-form-submit-button delete-button skinny">Pending...</div>
             </form>
           {{else}}
             <form
               method="POST"
               action="/tripFolders/{{tripFolder.id}}?_method=DELETE"
-              class="delete-form"
+              class="delete-form submit-once-form"
             >
-              <button class="folder-form-submit-button delete-button" type="submit">
+              <button class="folder-form-submit-button delete-button submit-once-button" type="submit">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">delete_sweep</span>
                 Delete
               </button>
+              <div class="dummy-button hidden folder-form-submit-button delete-button skinny">Pending...</div>
             </form>
           {{/if}}
       </div>

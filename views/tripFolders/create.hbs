@@ -1,7 +1,11 @@
 <div class="container">
   <div class="input-form-container">
     <h1 class="input-form-title">Create New Folder</h1>
-    <form class="login-form" action="/tripFolders/create" method="POST">
+    <form
+      class="login-form submit-once-form"
+      action="/tripFolders/create"
+      method="POST"
+    >
       <input
         type="text"
         name="folderName"
@@ -9,7 +13,10 @@
         required
       />
       <input type="date" name="tripDate" value="{{getDefaultDate}}" required />
-      <button class="form-submit-button" type="submit">Create</button>
+      <button class="form-submit-button submit-once-button" type="submit">
+        Create
+      </button>
+      <div class="dummy-button hidden form-submit-button">Pending...</div>
     </form>
     <div class="form-message">
       <a class="form-link" href="/tripFolders">Return</a>

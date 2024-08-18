@@ -2,7 +2,7 @@
   <div class="input-form-container">
     <h1 class="input-form-title">Edit Trip Folder</h1>
     <form
-      class="login-form"
+      class="login-form submit-once-form"
       action="/tripFolders/{{tripFolder.id}}?_method=PUT"
       method="POST"
     >
@@ -20,7 +20,11 @@
         placeholder="Trip date"
         required
       />
-      <button class="form-submit-button" type="submit">Update</button>
+      <button
+        class="form-submit-button submit-once-button"
+        type="submit"
+      >Update</button>
+      <div class="dummy-button hidden form-submit-button">Pending...</div>
     </form>
     <div class="form-message">
       <a class="form-link" href="/tripFolders/{{tripFolder.id}}">Return</a>

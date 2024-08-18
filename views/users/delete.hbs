@@ -3,10 +3,11 @@
         <h1 class="input-form-title">Delete User</h1>
         <h3 class="input-form-subtitle">Enter your credentials to delete your account.</h3>
         {{> errorMessage}}
-        <form class="login-form" action="/users/delete?_method=DELETE" method="POST">
+        <form class="login-form submit-once-form" action="/users/delete?_method=DELETE" method="POST">
             <input type="text" name="email" placeholder="Email" value="{{user.email}}" required>
             <input type="password" name="password" placeholder="Password" required>
-            <button class="form-submit-button delete-button" type="submit">Delete User</button>
+            <button class="form-submit-button delete-button submit-once-button" type="submit">Delete User</button>
+            <div class="dummy-button hidden form-submit-button delete-button">Pending...</div>
         </form>
     </div>
 </div>

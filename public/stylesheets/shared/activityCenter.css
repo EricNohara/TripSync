@@ -98,9 +98,10 @@
   background-color: var(--app-second-warning-color);
   border: none;
   border-radius: 2rem;
+  width: 1.65rem;
   color: white !important;
   transition: background-color 0.3s ease;
-  padding: 0.15rem;
+  padding: 0.15rem !important;
   transition: background-color 0.3s ease;
 }
 
@@ -112,9 +113,10 @@
 .accept-button {
   background-color: var(--app-success-second-color);
   color: white;
-  padding: 0.15rem;
+  padding: 0.15rem !important;
   border: none;
   border-radius: 2rem;
+  width: 1.65rem;
   transition: background-color 0.3s ease;
 }
 

@@ -16,14 +16,18 @@
               <form
                 action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/acceptIncomingRequest?_method=PUT"
                 method="POST"
+                class="submit-once-form"
               >
-                <button class="accept-button" type="submit"><span class="material-symbols-outlined request-list-icon">check</span></button>
+                <button class="accept-button submit-once-button" type="submit"><span class="material-symbols-outlined request-list-icon">check</span></button>
+                <div class="dummy-button accept-button hidden"><span class="material-symbols-outlined request-list-icon">check</span></div>
               </form>
               <form
                 action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/declineIncomingRequest?_method=PUT"
                 method="POST"
+                class="submit-once-form"
               >
-                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button submit-once-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <div class="dummy-button cancel-request-button hidden"><span class="material-symbols-outlined request-list-icon">close</span></div>
               </form>
             </div>
           {{/each}}
@@ -47,8 +51,10 @@
               <form
                 action="/activityCenter/{{this.tripFolder.id}}/{{this.user.id}}/cancelOutgoingRequest?_method=PUT"
                 method="POST"
+                class="submit-once-form"
               >
-                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button submit-once-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <div class="dummy-button hidden cancel-request-button"><span class="material-symbols-outlined request-list-icon">close</span></div>
               </form>
             </div>
           {{/each}}
@@ -72,8 +78,10 @@
               <form
                 action="/activityCenter/deleteNotification?_method=PUT&index={{@index}}"
                 method="POST"
+                class="submit-once-form"
               >
-                <button class="cancel-request-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <button class="cancel-request-button submit-once-button" type="submit"><span class="material-symbols-outlined request-list-icon">close</span></button>
+                <div class="dummy-button cancel-request-button hidden"><span class="material-symbols-outlined request-list-icon">close</span></div>
               </form>
             </div>
           {{/each}}
