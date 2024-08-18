@@ -378,9 +378,10 @@ router.post(
   upload.single("image"),
   uploadToS3Middleware,
   async (req, res) => {
+    let user, tripFolder;
     try {
-      const user = await retrieveUser(req, res);
-      const tripFolder = await TripFolder.findById(req.params.tripID);
+      user = await retrieveUser(req, res);
+      tripFolder = await TripFolder.findById(req.params.tripID);
 
       if (!req.file) throw new CustomErr("No File Uploaded");
 
@@ -398,6 +399,7 @@ router.post(
       await tripFolder.save();
       res.redirect(`/tripFolders/${tripFolder.id}`);
     } catch (err) {
+      console.error(err);
       res.render("tripFolders/folderPage/show", {
         tripFolder: tripFolder,
         errorMessage: "Cannot add file at this time",
