@@ -98,7 +98,6 @@ async function downloadFromS3(res, params) {
     res.setHeader("Content-Type", "application/octet-stream");
     Body.pipe(res); // Streams the file to the response
   } catch (err) {
-    console.error(err);
     throw new CustomErr("Cannot download file at this time");
   }
 }

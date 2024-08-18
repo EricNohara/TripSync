@@ -34,7 +34,6 @@ router.get("/", verifyToken, async (req, res) => {
   try {
     await retrieveUserAndRedirect(req, res, "index");
   } catch (err) {
-    console.error(err);
     res.redirect("/");
   }
 });
@@ -241,13 +240,19 @@ router.put("/:tripId/removeUser", verifyToken, async (req, res) => {
   try {
     const user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripId);
+
+    // Remove folder from user stored arrays
     const index = tripFolder.users.indexOf(user.id);
     const indexOfFolder = user.sharedFolders.indexOf(tripFolder.id);
-
+    const indexOfRecentFolder = user.recentFolders.indexOf(tripFolder.id);
     if (index > -1) tripFolder.users.splice(index, 1);
     else throw new CustomErr("Error removing user from trip folder");
     if (indexOfFolder > -1) user.sharedFolders.splice(indexOfFolder, 1);
     else throw new CustomErr("Error removing folder from user data");
+    if (indexOfRecentFolder > -1)
+      user.recentFolders.splice(indexOfRecentFolder, 1);
+
+    // update shared status if only one user left over
     if (tripFolder.users.length === 1) {
       tripFolder.isShared = false;
       const remainingUser = await User.findById(tripFolder.users[0]);
@@ -323,6 +328,7 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
   try {
     user = await retrieveUser(req, res);
     const tripFolder = await TripFolder.findById(req.params.tripID);
+
     // delete all files in folder
     for (const tripFileID of tripFolder.tripFiles) {
       const tripFile = await TripFile.findById(tripFileID);
@@ -330,6 +336,7 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
       await tripFile.deleteOne();
     }
 
+    // remove folder from every user's folder fields
     if (tripFolder.isShared) {
       const indexOfFolder = user.sharedFolders.indexOf(tripFolder.id);
       if (indexOfFolder > -1) user.sharedFolders.splice(indexOfFolder, 1);
@@ -339,6 +346,10 @@ router.delete("/:tripID", verifyToken, async (req, res) => {
       if (indexOfFolder > -1) user.privateFolders.splice(indexOfFolder, 1);
       else throw new CustomErr("Error removing folder from user info");
     }
+
+    const indexOfRecentFolder = user.recentFolders.indexOf(tripFolder.id);
+    if (indexOfRecentFolder > -1)
+      user.recentFolders.splice(indexOfRecentFolder, 1);
 
     await tripFolder.deleteOne();
     await user.save();
@@ -401,7 +412,6 @@ router.post(
       await tripFolder.save();
       res.redirect(`/tripFolders/${tripFolder.id}`);
     } catch (err) {
-      console.error(err);
       res.render("tripFolders/folderPage/show", {
         tripFolder: tripFolder,
         errorMessage: "Cannot add file at this time",
@@ -572,7 +582,6 @@ async function retrieveUserAndRedirect(req, res, route, tripFolders = null) {
       recentFolders: recentFolders,
     });
   } catch (err) {
-    console.error(err);
     res.redirect(`/?errorMessage=${encodeURIComponent(err)}`);
   }
 }
